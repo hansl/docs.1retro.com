@@ -1,0 +1,15 @@
+{
+  // Structural Markdown linting for the docs repo.
+  // Prose rules that a generic linter cannot express (one sentence per line,
+  // voice) are enforced manually; see STYLE.md.
+  "config": {
+    "default": true,
+    // One sentence per line makes individual lines long on purpose, so the
+    // line-length rule does not apply here.
+    "MD013": false
+  },
+  // `.mdx` is intentionally excluded: it contains JSX that this linter cannot
+  // parse. The prose checker covers `.mdx` instead.
+  "globs": ["**/*.md"],
+  "ignores": ["node_modules", "dist", ".astro"]
+}

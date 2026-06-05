@@ -1,0 +1,27 @@
+---
+title: 1Retro Docs
+description: Specifications and documentation for 1Retro.
+template: splash
+hero:
+  tagline: Specifications and documentation for 1Retro, the cloud platform for retro game saves.
+  actions:
+    - text: Specifications
+      link: /specifications/
+      icon: right-arrow
+    - text: Guides
+      link: /guides/getting-started/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card title="Specifications" icon="document">
+		The formats and protocols behind 1Retro, written to be implemented by anyone.
+	</Card>
+	<Card title="Guides" icon="open-book">
+		How to use 1Retro across the web, desktop, CLI, and handhelds.
+		Start with [Getting Started](/guides/getting-started/).
+	</Card>
+</CardGrid>

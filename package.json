@@ -1,0 +1,22 @@
+{
+  "name": "docs.1retro.com",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "astro dev",
+    "prebuild": "npm run lint",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "markdownlint-cli2"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@astrojs/starlight": "^0.39.3",
+    "astro": "^6.3.1",
+    "markdownlint-cli2": "^0.22.1",
+    "sharp": "^0.34.5",
+    "starlight-links-validator": "^0.24.0"
+  }
+}
