@@ -10,12 +10,11 @@
     "preview": "astro preview",
     "lint": "markdownlint-cli2"
   },
-  "dependencies": {
-  },
   "devDependencies": {
     "@astrojs/starlight": "^0.39.3",
     "astro": "^6.3.1",
     "markdownlint-cli2": "^0.22.1",
+    "remark-code-import": "^1.2.0",
     "sharp": "^0.34.5",
     "starlight-links-validator": "^0.24.0"
   }

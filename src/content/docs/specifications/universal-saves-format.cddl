@@ -1,0 +1,103 @@
+; ============================================================================
+; 1SAV - Universal Saves Format, v1
+; Spec version 0.1: not yet stabilized, expect breaking changes.
+; CDDL per RFC 8610. Validates the canonical (definite-length) encoding.
+; ============================================================================
+
+; ---- File framing ----------------------------------------------------------
+; CBOR self-describe tag #55799 (RFC 9277) wrapping the application bundle
+; tag #827539798 ("1SAV") wrapping the 3-element bundle array.
+saves-file = #6.55799(#6.827539798(bundle))
+
+bundle = [
+  header,           ; [0] header
+  metadata / null,  ; [1] metadata (null when empty)
+  parts,            ; [2] parts
+]
+
+; ---- [0] Header ------------------------------------------------------------
+header = {
+  0 => tstr,          ; type       (single_save | multi_game_save | ... ; round-trip unknown)
+  1 => epoch-time,    ; created_at
+  ? 2 => tstr,        ; system     (gb | snes | n64 | 3ds | ...)
+  ? 3 => game,        ; game       (identification hints)
+  ? 4 => source,      ; source     (producer identity)
+}
+
+game = {
+  ? 0 => game-ids,    ; gameId
+  ? 1 => rom-hashes,  ; rom_hashes
+  ? 2 => tstr,        ; rom_filename
+  ? 3 => tstr,        ; serial
+  ? 4 => tstr,        ; name
+}
+
+; reverse-DNS resolver name ("com.1retro", "org.hasheous", ...) => id in that catalog.
+; `+` forbids the empty map; the id is an integer or string, per catalog.
+game-ids = {
+  + tstr => uint / tstr,
+}
+
+rom-hashes = {
+  ? 0 => hexstr,      ; sha1   (40 hex chars)
+  ? 1 => hexstr,      ; md5    (32 hex chars)
+  ? 2 => hexstr,      ; sha256 (64 hex chars)
+  ? 3 => hexstr,      ; crc32  (8 hex chars)
+}
+
+source = {
+  ? 0 => tstr,        ; device_type
+  ? 1 => tstr,        ; fingerprint
+  ? 2 => tstr,        ; app
+  ? 3 => tstr,        ; app_version
+}
+
+; ---- [1] Metadata ----------------------------------------------------------
+; Spec-owned integer keys, plus open-ended reverse-DNS text extension keys.
+; `* tstr => any` admits unknown text keys (extensions); the absence of any
+; `* uint => any` rule makes unknown integer keys fail validation.
+metadata = {
+  ? 0 => tstr,        ; description
+  ? 1 => rtc,         ; rtc
+  * tstr => any,      ; extension keys (reverse-DNS), e.g. "io.mgba.rtc"
+}
+
+rtc = {
+  0 => epoch-time,    ; epoch_seconds - in-game clock, normalized to a Unix instant
+  1 => tstr,          ; source_clock
+  ? 2 => uint,        ; accuracy_ms
+}
+
+; ---- [2] Parts -------------------------------------------------------------
+; A bare map is a `save`; a wrapping tag discriminates the other kinds.
+parts = [0*20 part-entry]   ; max 20 (minimum unconstrained by prose)
+
+part-entry = part           ; save (default, bare map)
+           / #6.40010(part) ; save_state
+           / #6.40011(part) ; screenshot
+           / #6.40012(part) ; thumbnail
+           / #6.40013(part) ; aux
+
+part = {
+  0 => 0..19,         ; id
+  1 => tstr,          ; role
+  2 => tstr,          ; path
+  ? 3 => tstr,        ; content_type
+  4 => uint,          ; size (uncompressed)
+  5 => bstr .size 32, ; sha256 (over uncompressed payload)
+  6 => encoding,      ; encoding
+  7 => payload,       ; payload
+}
+
+encoding = "none" / "zstd"
+
+payload = bstr / external-ref
+external-ref = {
+  0 => "ref",
+  1 => bstr .size 32, ; sha256 (MUST equal the part's key 5)
+  ? 2 => tstr,        ; URI
+}
+
+; ---- Primitives ------------------------------------------------------------
+epoch-time = #6.1(number)             ; CBOR tag 1, epoch-based date/time
+hexstr     = tstr .regexp "[0-9a-f]+" ; lowercase hex

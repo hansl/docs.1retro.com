@@ -8,7 +8,7 @@ Specs and guides are written in Markdown so anyone can read them on GitHub or pr
 ## What lives here
 
 - **Specifications**: the formats and protocols behind 1Retro, written to be implemented by anyone.
-  The first is the Universal Saves Format (`.saves` / `1SAV`); the 1Forge save-parser system and others follow.
+  The first is the Universal Saves Format (`.1saves` / `1SAV`); the 1Forge save-parser system and others follow.
 - **Guides & product docs**: how to use 1Retro across platforms (web, desktop, CLI, MiSTer, OnionOS, and friends).
 
 Content lives under `src/content/docs/`, split into `specifications/` and `guides/`.

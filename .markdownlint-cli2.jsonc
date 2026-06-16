@@ -6,7 +6,10 @@
     "default": true,
     // One sentence per line makes individual lines long on purpose, so the
     // line-length rule does not apply here.
-    "MD013": false
+    "MD013": false,
+    // Spec tables carry long prose cells; keeping pipes visually aligned is
+    // impractical and would rebreak on every edit, so column alignment is off.
+    "MD060": false
   },
   // `.mdx` is intentionally excluded: it contains JSX that this linter cannot
   // parse. The prose checker covers `.mdx` instead.
