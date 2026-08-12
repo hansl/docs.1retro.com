@@ -1,0 +1,26 @@
+; ============================================================================
+; com.1retro.forge - what a Forge parser read out of a save, and which parser
+;
+; One key rather than two, because the halves are useless apart: a bag of
+; parsed values says nothing without the name of the parser that produced it,
+; and that name alone says only that something ran.
+;
+; Non-normative. The Forge specification will live in this repository and will
+; define this properly; until then the envelope carries the two things that are
+; known, and this file records that shape so the page and its example cannot
+; drift. Written closed for that reason: a bundle carrying a shape Forge added
+; later stays valid either way, since to the saves format an extension value is
+; `any`.
+;
+; The root here is the value carried under the key, not a bundle.
+; ============================================================================
+
+forge = {
+  0 => tstr,          ; which parser read the save ("alttp", "ff7")
+  ? 1 => parsed,      ; what it found
+}
+
+; Deliberately unconstrained. What this holds depends on the game and on the
+; parser version, so keys and values are Forge's: integer, text, or anything
+; else CBOR carries. A consumer that is not Forge interprets none of it.
+parsed = { * any => any }

@@ -1,18 +1,17 @@
 {
   // Structural Markdown linting for the docs repo.
-  // Prose rules that a generic linter cannot express (one sentence per line,
-  // voice) are enforced manually; see STYLE.md.
+  // Formatting belongs to Prettier; this only checks what a formatter cannot.
+  // Prose rules a generic linter cannot express (voice) are manual; see STYLE.md.
   "config": {
     "default": true,
-    // One sentence per line makes individual lines long on purpose, so the
-    // line-length rule does not apply here.
+    // Prettier wraps prose at 120, but will not break a table row or a long
+    // URL, so those lines run over on purpose and length is not linted.
     "MD013": false,
-    // Spec tables carry long prose cells; keeping pipes visually aligned is
-    // impractical and would rebreak on every edit, so column alignment is off.
-    "MD060": false
+    // Prettier aligns table pipes on every run, so the linter need not ask.
+    "MD060": false,
   },
   // `.mdx` is intentionally excluded: it contains JSX that this linter cannot
   // parse. The prose checker covers `.mdx` instead.
   "globs": ["**/*.md"],
-  "ignores": ["node_modules", "dist", ".astro"]
+  "ignores": ["node_modules", "dist", ".astro"],
 }
