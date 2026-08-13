@@ -639,7 +639,7 @@ The spec deliberately does _not_ cover:
 ## Appendix A: CDDL schema
 
 A [CDDL](https://www.rfc-editor.org/rfc/rfc8610) (RFC 8610) schema describes a v1 bundle. It lives in
-[`universal-saves-format.cddl`](https://github.com/hansl/docs.1retro.com/blob/main/src/content/docs/specifications/universal-saves-format.cddl),
+[`universal-saves-format.cddl`](https://github.com/one-retro/docs/blob/main/src/content/docs/specifications/universal-saves-format.cddl),
 the single source of truth that validators such as `cddl` and `cuddle` consume directly. The
 [rendered copy](/specifications/universal-saves-format-cddl/) carries it alongside the list of what a schema can and
 cannot check here.

@@ -7,7 +7,7 @@ sidebar:
 
 This is the [CDDL](https://www.rfc-editor.org/rfc/rfc8610) (RFC 8610) schema for the
 [Universal Saves Format](/specifications/universal-saves-format/). The source of truth is
-[`universal-saves-format.cddl`](https://github.com/hansl/docs.1retro.com/blob/main/src/content/docs/specifications/universal-saves-format.cddl);
+[`universal-saves-format.cddl`](https://github.com/one-retro/docs/blob/main/src/content/docs/specifications/universal-saves-format.cddl);
 validators consume that file directly, and this page renders it at build time.
 
 One thing the spec's prose leaves implicit is pinned here: the small named maps (`source`, `card`) use **integer keys in
