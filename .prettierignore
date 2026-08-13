@@ -1,3 +1,8 @@
 # Prettier already skips everything in .gitignore (dist, .astro, node_modules).
 # Generated files that npm owns the formatting of:
 package-lock.json
+
+# Build environments drop their own files into the working directory: the App
+# Platform Node buildpack unpacks into .heroku/, and checking third-party
+# sources there failed prebuild and so failed the deploy.
+.heroku/
