@@ -12,8 +12,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "conformance": "node scripts/build-conformance.js",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && markdownlint-cli2",
+    "prettier": "prettier .claude .do conformance scripts src test \"*.md\" \"*.mjs\" \"*.json\" .prettierrc .markdownlint-cli2.jsonc",
+    "format": "npm run --silent prettier -- --write",
+    "lint": "npm run --silent prettier -- --check && markdownlint-cli2",
     "test": "node --test \"test/**/*.test.js\""
   },
   "devDependencies": {

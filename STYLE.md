@@ -5,8 +5,8 @@ many authors.
 
 ## Formatting
 
-Prettier owns formatting here, Markdown included. Run `npx prettier --write .` before opening a PR, or let your editor
-do it on save.
+Prettier owns formatting here, Markdown included. Run `npm run format` before opening a PR, or let your editor do it on
+save.
 
 Line breaks inside a paragraph are the formatter's business. Write a paragraph however it comes out and let Prettier
 wrap it at 120 columns; the settings live in `.prettierrc`. Do not hand-wrap prose or hand-align table pipes, because

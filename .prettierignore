@@ -2,7 +2,9 @@
 # Generated files that npm owns the formatting of:
 package-lock.json
 
-# Build environments drop their own files into the working directory: the App
-# Platform Node buildpack unpacks into .heroku/, and checking third-party
-# sources there failed prebuild and so failed the deploy.
+# The `prettier` script in package.json lists the paths this repo owns, so
+# build-environment files are out of range by construction. This is the
+# backstop for a run over the whole directory: the App Platform Node buildpack
+# unpacks into .heroku/, and checking third-party sources there failed prebuild
+# and so failed the deploy.
 .heroku/
