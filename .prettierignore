@@ -1,0 +1,3 @@
+# Prettier already skips everything in .gitignore (dist, .astro, node_modules).
+# Generated files that npm owns the formatting of:
+package-lock.json

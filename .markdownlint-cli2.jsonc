@@ -1,12 +1,14 @@
 {
   // Structural Markdown linting for the docs repo.
-  // Prose rules that a generic linter cannot express (one sentence per line,
-  // voice) are enforced manually; see STYLE.md.
+  // Formatting belongs to Prettier; this only checks what a formatter cannot.
+  // Prose rules a generic linter cannot express (voice) are manual; see STYLE.md.
   "config": {
     "default": true,
-    // One sentence per line makes individual lines long on purpose, so the
-    // line-length rule does not apply here.
-    "MD013": false
+    // Prettier wraps prose at 120, but will not break a table row or a long
+    // URL, so those lines run over on purpose and length is not linted.
+    "MD013": false,
+    // Prettier aligns table pipes on every run, so the linter need not ask.
+    "MD060": false,
   },
   // `.mdx` is intentionally excluded: it contains JSX that this linter cannot
   // parse. The prose checker covers `.mdx` instead.
@@ -14,7 +16,8 @@
   // Scoped to the Markdown this repo owns rather than a bare `**/*.md`. Build
   // environments drop their own Markdown into the working directory -- the
   // App Platform Node buildpack unpacks into `.heroku/` -- and linting that
-  // failed the deploy on third-party README files.
-  "globs": ["*.md", "src/**/*.md"],
-  "ignores": ["node_modules", "dist", ".astro", ".heroku"]
+  // failed the deploy on third-party README files. `conformance/` is listed
+  // because the corpus carries READMEs of its own that this repo does own.
+  "globs": ["*.md", "src/**/*.md", "conformance/**/*.md"],
+  "ignores": ["node_modules", "dist", ".astro", ".heroku"],
 }

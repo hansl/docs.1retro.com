@@ -14,14 +14,18 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid } from "@astrojs/starlight/components";
 
 <CardGrid>
-	<Card title="Specifications" icon="document">
-		The formats and protocols behind 1Retro, written to be implemented by anyone.
-	</Card>
-	<Card title="Guides" icon="open-book">
-		How to use 1Retro across the web, desktop, CLI, and handhelds.
-		Start with [Getting Started](/guides/getting-started/).
-	</Card>
+  <Card title="Specifications" icon="document">
+    The formats and protocols behind 1Retro, written to be implemented by anyone.
+  </Card>
+  <Card title="Registries" icon="list-format">
+    The known values behind the specs' open vocabularies: [systems](/registries/systems/), [emulator
+    cores](/registries/cores/), and more. Browse the [Registries](/registries/).
+  </Card>
+  <Card title="Guides" icon="open-book">
+    How to use 1Retro across the web, desktop, CLI, and handhelds. Start with [Getting
+    Started](/guides/getting-started/).
+  </Card>
 </CardGrid>

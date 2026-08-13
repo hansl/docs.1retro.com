@@ -1,0 +1,156 @@
+; ============================================================================
+; 1SAV - Universal Saves Format, v1
+; Spec version 0.1: not yet stabilized, expect breaking changes.
+;
+; CDDL per RFC 8610. This file is the shape of a bundle and nothing else.
+; Why the shape is what it is:  /specifications/universal-saves-format/
+; What this schema cannot check: /specifications/universal-saves-format-cddl/
+;
+; CDDL validates the data model, not the encoding; every container in a bundle
+; is definite-length and deterministically encoded per RFC 8949 section 4.2.
+; ============================================================================
+
+; ---- File framing ----------------------------------------------------------
+saves-file = #6.827539798(bundle)   ; tag reads "1SAV" from byte 1 of the file
+
+bundle = [
+  header,           ; [0] header
+  parts,            ; [1] parts
+]
+
+; Integer keys belong to the spec; text keys belong to producers. This schema
+; describes v0.1 exactly, so an integer key it does not list fails validation.
+; A decoder is looser on purpose: it ignores and round-trips an integer key it
+; does not know, since that key is a later minor version's. See the spec.
+
+; ---- [0] Header ------------------------------------------------------------
+; `* reverse-dns => any` admits a producer's own keys. What sits under one is
+; entirely that producer's: any CBOR value, of any shape, never inspected here.
+header = {
+  ? 0 => epoch-time,  ; created_at
+  ? 1 => system-slug, ; system      (gb | snes | n64 | 3ds | ...)
+  ? 2 => game,        ; game        (identification hints)
+  ? 3 => source,      ; source      (bundle producer; default for all parts)
+  ? 4 => card,        ; card        (present when the bundle is a memory card)
+  ? 5 => tstr,        ; description (free-form human note)
+  * reverse-dns => any,   ; extension keys, e.g. "x.1sav.rtc"
+}
+
+game = {
+  ? 0 => game-ids,    ; game_id
+  ? 1 => rom-hashes,  ; rom_hashes
+  ? 2 => tstr,        ; rom_filename
+  ? 3 => tstr,        ; serial
+  ? 4 => tstr,        ; name
+}
+
+; reverse-DNS resolver name ("com.1retro", "org.hasheous", ...) => this game's
+; id in that catalog, an integer or a string per catalog. The name is minted the
+; same way an extension key is, so it is checked the same way.
+game-ids = {
+  + reverse-dns => uint / tstr,
+}
+
+; Hash values; see Common Types for the tags, the ordering and the comparison
+; rules.
+rom-hashes = [+ hash]
+
+hash = #6.18540(bstr .size 32)  ; sha256
+     / #6.18542(bstr .size 20)  ; sha1
+     / #6.46010(bstr .size 4)   ; crc32
+     / #6.46011(bstr .size 16)  ; md5
+
+source = {
+  ? 0 => device-kind, ; device_kind (emulator | cartridge-reader | flashcart | service)
+  ? 1 => tstr,        ; fingerprint
+  ? 2 => app,         ; app         (core slug "mgba", or a minted name "io.mgba")
+  ? 3 => tstr,        ; app_version
+}
+
+card = {
+  0 => card-format,   ; format      (ps1-mc | ps2-mc | n64-cpak | gc-mc | neogeo-mc | vmu | saturn-bup)
+  1 => uint,          ; capacity    (data capacity, not the length of a dump)
+  ? 2 => bstr,        ; system_area (card-level bytes belonging to no save)
+}
+
+; ---- [1] Parts -------------------------------------------------------------
+parts = [+ part]
+
+part = {
+  0 => uint,          ; id
+  ? 1 => kind,        ; kind     (absent means "save"; conditions everything below)
+  ? 2 => role,        ; role     (absent means "primary")
+  ? 3 => path,        ; path     (absent means the role is the whole address)
+  ? 4 => uint,        ; slot     (index in the container this part came from)
+  ? 5 => bstr,        ; dirent   (that container's directory entry, verbatim)
+  ? 6 => tstr,        ; content_type
+  ? 10 => source,     ; source   (this part's producer; absent = header source)
+  ? 11 => game,       ; game     (this part's game; absent = header game)
+  ? 12 => system-slug,; system   (index copy of a nested bundle's header system)
+  ? 13 => binding,    ; binding  (payload is bound to the console that wrote it)
+  ( compressed // thin // embedded ),
+  * reverse-dns => any,   ; extension keys, flat as in the header
+}
+
+; Keys 7 to 9 describe how to read the payload, and a streaming decoder meets
+; them in the order it uses them: whether to inflate, how much that yields, and
+; what the result must hash to. `size` is carried only where it cannot be
+; derived, which leaves a part in one of three shapes.
+;
+; Arm order matters here and is not cosmetic: the tool takes the first that
+; matches without backtracking, so the most constrained shape comes first. With
+; `embedded` leading, a compressed part matches its `-1 => bstr` and then fails
+; on the leftover keys.
+compressed = ( 7 => encoding, 8 => uint, 9 => sha256-hash, -1 => bstr )
+thin       = ( 8 => uint, 9 => sha256-hash, -1 => external-ref )
+embedded   = ( 9 => sha256-hash, -1 => bstr )
+
+kind = slug / reverse-dns     ; card-image | bundle | aux, or a minted name
+
+; Spec-owned, like a card format: a binding names a category everyone shares,
+; so minting into it would split the category rather than extend it.
+binding = slug                ; device | account | device-account | medium
+
+; "none" is the default and is written by leaving key 7 out, so the only
+; encoding ever spelled here is the one that says something.
+encoding = "zstd"
+
+external-ref = {
+  0 => "ref",
+  1 => sha256-hash,   ; MUST equal the part's key 9
+  ? 2 => tstr,        ; URI
+}
+
+; Tagged even though this spec pins the algorithm, so that a generic CBOR tool
+; reading the bare-hash tag block can name the digest without knowing anything
+; about this format. Only sha256 is legal here: one algorithm, so identity and
+; dedup have one answer rather than a choice.
+sha256-hash = #6.18540(bstr .size 32)
+
+; ---- Names -----------------------------------------------------------------
+; One slug grammar everywhere: lowercase, single dashes between runs, no leading
+; or trailing dash, at most 64 bytes. The shape and the length are separate
+; constraints, so `.and` states them separately rather than smuggling the bound
+; into a repetition count.
+;
+; A slug is therefore exactly one DNS label, and a reverse-DNS name is two or
+; more, so the two vocabularies are disjoint and neither can collide with the
+; other.
+slug = (tstr .regexp "[a-z0-9]+(-[a-z0-9]+)*") .and (tstr .size (1..64))
+
+; The reverse-DNS grammar from Common Types, written without `\` so it stays a
+; plain CDDL string. `x` is the reserved tree for producers with no domain.
+reverse-dns = tstr .regexp "(x|[a-z]{2,63})([.][a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+"
+
+; Aliases below carry no extra constraint; they name which vocabulary a field
+; draws from, which the key tables in the spec spell out.
+system-slug = slug                    ; System Slugs registry
+device-kind = slug                    ; spec-owned; a producer may not mint one
+app = slug / reverse-dns              ; Emulator Cores registry slug, or a minted name
+role = slug                           ; Save Roles registry
+card-format = slug                    ; spec-owned; a producer may not mint one
+
+path = tstr .size (1..512)            ; byte length, not character count; "" is absence
+
+; ---- Primitives ------------------------------------------------------------
+epoch-time = #6.1(int)                ; CBOR tag 1, whole seconds

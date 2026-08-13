@@ -1,0 +1,11 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+[*.md]
+# Prettier owns wrapping (see .prettierrc). Editors that hard-wrap on their own
+# break links across lines, so leave line length to the formatter.
+max_line_length = off

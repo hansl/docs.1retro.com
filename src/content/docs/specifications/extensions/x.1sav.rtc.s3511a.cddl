@@ -1,0 +1,20 @@
+; ============================================================================
+; x.1sav.rtc.s3511a - the latched state of a Seiko S-3511A real-time clock
+;
+; An extension key for the Universal Saves Format, defined by these
+; specifications under a name reserved in the Vendor Names registry because
+; every emulator that keeps this clock keeps the same two values.
+;
+; The root here is the value carried under the key, not a bundle. A bundle
+; validates against the format's own schema whatever this holds, since an
+; extension value is `any` there; this file is what makes the shape checkable.
+; ============================================================================
+
+rtc-s3511a = {
+  0 => bstr .size 7, ; components - latched BCD: year, month, day, weekday, hour, minute, second
+  1 => uint,         ; control    - the control register as read
+}
+
+; 24-hour mode is bit 6 of the control register and does not get a field of its
+; own. Two spellings of one value let a bundle contradict itself, which the
+; format rules out everywhere else; see "One encoding per bundle".
