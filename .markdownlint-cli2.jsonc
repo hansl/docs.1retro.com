@@ -12,6 +12,12 @@
   },
   // `.mdx` is intentionally excluded: it contains JSX that this linter cannot
   // parse. The prose checker covers `.mdx` instead.
-  "globs": ["**/*.md"],
-  "ignores": ["node_modules", "dist", ".astro"],
+  //
+  // Scoped to the Markdown this repo owns rather than a bare `**/*.md`. Build
+  // environments drop their own Markdown into the working directory -- the
+  // App Platform Node buildpack unpacks into `.heroku/` -- and linting that
+  // failed the deploy on third-party README files. `conformance/` is listed
+  // because the corpus carries READMEs of its own that this repo does own.
+  "globs": ["*.md", "src/**/*.md", "conformance/**/*.md"],
+  "ignores": ["node_modules", "dist", ".astro", ".heroku"],
 }

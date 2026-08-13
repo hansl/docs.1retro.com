@@ -54,6 +54,23 @@ reference tool and skip themselves when it is missing, so install it with `gem i
 
 You do not need any of this to edit prose. Markdown changes can be made and reviewed directly on GitHub.
 
+## Deployment
+
+The site is served as a static build on
+[DigitalOcean App Platform](https://docs.digitalocean.com/products/app-platform/) at
+[docs.1retro.com](https://docs.1retro.com).
+
+Pushes to `main` deploy automatically. App Platform runs `npm run build` with the Node.js buildpack and publishes
+`./dist`. Because `prebuild` runs `npm run lint`, a Markdown lint failure or a broken internal link fails the deploy
+rather than shipping.
+
+The app configuration lives in [`.do/app.yaml`](./.do/app.yaml) and is the source of truth. After editing it, apply the
+change with:
+
+```sh
+doctl apps update <app-id> --spec .do/app.yaml
+```
+
 ## Contributing
 
 Changes are welcome, from typo fixes to whole new specs. See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to propose a
