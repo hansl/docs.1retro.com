@@ -23,7 +23,7 @@ export default defineConfig({
 				{
 					icon: 'github',
 					label: 'GitHub',
-					href: 'https://github.com/hansl/docs.1retro.com',
+					href: 'https://github.com/one-retro/docs',
 				},
 			],
 			sidebar: [

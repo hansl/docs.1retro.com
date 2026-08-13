@@ -1,0 +1,50 @@
+# DigitalOcean App Platform spec for docs.1retro.com.
+#
+# This file is the source of truth for the app's configuration. To apply a
+# change after editing it:
+#
+#   doctl apps update <app-id> --spec .do/app.yaml
+#
+# Contains no secrets: the site is a public static build from a public repo.
+name: one-retro-docs
+region: sfo
+
+domains:
+  - domain: docs.1retro.com
+    type: PRIMARY
+
+static_sites:
+  - name: docs
+    github:
+      repo: one-retro/docs
+      branch: main
+      deploy_on_push: true
+
+    # Node.js buildpack. devDependencies are installed for the build and only
+    # pruned before deploy, which is harmless here since we ship `dist/` alone.
+    # The Node version comes from `engines.node` in package.json.
+    environment_slug: node-js
+    build_command: npm run build
+    output_dir: dist
+
+    envs:
+      # Every build tool here (astro, starlight, markdownlint, sharp) is a
+      # devDependency, so a production-mode install would fetch nothing and the
+      # build would fail on a missing `astro`. Pin this rather than rely on the
+      # buildpack's default. Not a secret.
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+        scope: BUILD_TIME
+
+    index_document: index.html
+    # Starlight emits a real 404 page; serve it instead of a catchall so that
+    # missing pages return 404 rather than 200 with the homepage.
+    error_document: 404.html
+
+ingress:
+  rules:
+    - component:
+        name: docs
+      match:
+        path:
+          prefix: /
