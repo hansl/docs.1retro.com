@@ -16,17 +16,17 @@ original card byte for byte, and it is not meant to be. A producer that wants by
 
 ## Per-format facts
 
-`format` fixes the length of `dirent`:
+`format` fixes two numbers, both in bytes: the length of a `dirent`, and the size of a block.
 
-| Format       | `dirent` | Notes                                                                        |
-| ------------ | -------- | ---------------------------------------------------------------------------- |
-| `ps1-mc`     | 128      |                                                                              |
-| `ps2-mc`     | 512      | One entry for the save's directory, one per file inside it.                  |
-| `n64-cpak`   | 32       |                                                                              |
-| `gc-mc`      | 64       |                                                                              |
-| `vmu`        | 32       |                                                                              |
-| `neogeo-mc`  | 4        |                                                                              |
-| `saturn-bup` | none     | The entry lives in the first block of the save itself, so the key is absent. |
+| Format       | `dirent` | Block | Notes                                                                                                                                                                           |
+| ------------ | -------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ps1-mc`     | 128      | 8192  | The 128 is one directory frame, and a block is 64 of them.                                                                                                                      |
+| `ps2-mc`     | 512      | 1024  | One entry for the save's directory, one per file inside it. A block is a cluster of two 512-byte pages.                                                                         |
+| `n64-cpak`   | 32       | 256   | The pak's own word for a block is a page.                                                                                                                                       |
+| `gc-mc`      | 64       | 8192  |                                                                                                                                                                                 |
+| `vmu`        | 32       | 512   |                                                                                                                                                                                 |
+| `neogeo-mc`  | 4        | 64    | Cards run from 2 KiB to 16 KiB and every one of them uses the same block.                                                                                                       |
+| `saturn-bup` | none     | 64    | The entry lives in the first block of the save itself, so the key is absent. The 64 is the console's internal memory; a backup cartridge is a separate device carrying its own. |
 
 The names are the ones already in circulation for these layouts, not system slugs with a suffix, which is why `ps1-mc`
 says `ps1` where the [registry](/registries/systems/) says `psx`, and why `vmu` carries no system at all. Reading a
@@ -39,15 +39,23 @@ one means documenting its `dirent` length and its rebuild rules alongside the na
 
 ## Capacity and out-of-band bytes
 
-[`capacity`](/specifications/universal-saves-format/#card-map) is the card's data capacity: the bytes saves can occupy.
-It is not necessarily the length of a dump of that card, because some media carry an out-of-band area that is invisible
-to the filesystem.
+[`capacity`](/specifications/universal-saves-format/#card-map) is the size of the card's data area: every byte the
+console can address on it, the blocks the filesystem keeps for itself included. It is the figure the card is sold under,
+and it does not move when the card fills up.
 
-PS2 is the case that bites. An 8 MB PS2 card holds 8388608 bytes of data, and a raw dump from a hardware reader is
-8650752 bytes, because every 512-byte page carries 16 further bytes of spare area holding ECC. So `capacity` on a PS2
-card is 8388608, and a byte-exact [`card-image`](/specifications/universal-saves-format/#part-kinds) part of the same
-card is 8650752 bytes, and the two are _supposed_ to disagree. Read the image's length off its own `size`; never derive
-it from `capacity`.
+It is not the room a save has. Every format here spends part of its data area on a header, a directory and a FAT, and
+some spend a great deal more: a VMU addresses 256 blocks and hands saves 200 of them, and a GameCube Memory Card 59 has
+64 blocks and is named for the 59 that survive its header, its directory and its block allocation table, the last two
+mirrored. `capacity` on those two is 131072 and 524288, the whole area in both cases. What actually fits is that number
+minus what the format reserves, which is a rebuild rule rather than a field: a writer allocating blocks has to know it,
+and nothing else does.
+
+It is not necessarily the length of a dump either, because some media carry an out-of-band area that is invisible to the
+filesystem. PS2 is the case that bites. An 8 MB PS2 card holds 8388608 bytes of data, and a raw dump from a hardware
+reader is 8650752 bytes, because every 512-byte page carries 16 further bytes of spare area holding ECC. So `capacity`
+on a PS2 card is 8388608, and a byte-exact [`card-image`](/specifications/universal-saves-format/#part-kinds) part of
+the same card is 8650752 bytes, and the two are _supposed_ to disagree. Read the image's length off its own `size`;
+never derive it from `capacity`.
 
 The split follows what a writer does. ECC is regenerated on write, like every other structural field below, so a save's
 payload never carries it and `capacity` never counts it. A `card-image` keeps it, because keeping the card byte for byte
@@ -70,8 +78,8 @@ GameCube, company and game code plus note name on N64, NGH plus sub-number on Ne
 business, so recording it would preserve a number that is wrong the moment the save lands anywhere else.
 
 Block _counts_ are a different thing, and they are still not stored, because they are derivable: a producer stores
-exactly the bytes the card allocated, so the count is the nested bundle's total payload size divided by the format's
-block size.
+exactly the bytes the card allocated, so the count is the nested bundle's total payload size divided by the
+[block size](#per-format-facts) for the format.
 
 ## What a writer regenerates
 

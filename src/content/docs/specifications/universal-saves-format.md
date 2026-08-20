@@ -281,15 +281,15 @@ save, each carrying that save's directory entry. Everything hardware-specific ab
 [Memory Cards](/specifications/memory-cards/): what each format fixes, what a writer has to regenerate, and what
 splitting a card drops.
 
-| Key | Name          | Type | Req? | Notes                                                                                                                                                                                    |
-| --- | ------------- | ---- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0   | `format`      | text | yes  | `ps1-mc` \| `ps2-mc` \| `n64-cpak` \| `gc-mc` \| `neogeo-mc` \| `vmu` \| `saturn-bup`. The one open vocabulary a producer may not mint into; see [Minting a name](#minting-a-name).      |
-| 1   | `capacity`    | uint | yes  | The card's **data** capacity in bytes: what saves can occupy, excluding any out-of-band area. Never the length of a dump, which a [`card-image`](#part-kinds) reports in its own `size`. |
-| 2   | `system_area` | bstr | no   | The card-level bytes that belong to no save, verbatim and opaque.                                                                                                                        |
+| Key | Name          | Type | Req? | Notes                                                                                                                                                                                                                                                                                                                                        |
+| --- | ------------- | ---- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0   | `format`      | text | yes  | `ps1-mc` \| `ps2-mc` \| `n64-cpak` \| `gc-mc` \| `neogeo-mc` \| `vmu` \| `saturn-bup`. The one open vocabulary a producer may not mint into; see [Minting a name](#minting-a-name).                                                                                                                                                          |
+| 1   | `capacity`    | uint | yes  | The size of the card's **data area** in bytes, the blocks the filesystem keeps for itself included and any out-of-band area excluded. Neither the room left for saves nor the length of a dump, which a [`card-image`](#part-kinds) reports in its own `size`. See [Capacity](/specifications/memory-cards/#capacity-and-out-of-band-bytes). |
+| 2   | `system_area` | bstr | no   | The card-level bytes that belong to no save, verbatim and opaque.                                                                                                                                                                                                                                                                            |
 
 `format` and [`system`](#0-header-map) answer different questions. `system` decides which emulators can load these bytes
-at all; `format` decides how they are laid out, fixing the length of each save's `dirent` and selecting which rebuild
-rules apply. Both are properties of the medium rather than of the reader, for the reason
+at all; `format` decides how they are laid out, fixing the length of each save's `dirent` and the size of a block, and
+selecting which rebuild rules apply. Both are properties of the medium rather than of the reader, for the reason
 [`system`](#why-system-is-not-part-of-game) gives, so a PS1 card read through a PS2 is `system: "psx"` and
 `format: "ps1-mc"` at once.
 

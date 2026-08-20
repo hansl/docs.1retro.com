@@ -128,6 +128,13 @@ const POKEMON = map({ 3: "POKEMON RED", 4: "Pokemon Red" });
 
 const gbSave = oneFileSave("gb", POKEMON, pattern(32768, 11));
 
+// Games for the three card fixtures below. A Neo Geo save is addressed by its
+// game's NGH number rather than by any name, so that is the serial here; a
+// GameCube save is addressed by the game code its dirent carries.
+const SONIC = map({ 4: "Sonic Adventure" });
+const METAL_SLUG = map({ 3: "NGH-201", 4: "Metal Slug" });
+const FZERO = map({ 3: "GFZE8P", 4: "F-Zero GX" });
+
 export const valid = {
   // An empty header and one bare save. The floor of what a bundle is.
   minimal: bundle(new Map(), [part()]),
@@ -320,6 +327,81 @@ export const valid = {
       id: 0,
       path: "PANZER_SV",
       slot: 1,
+    }),
+  ]),
+
+  // A Dreamcast VMU. Blocks are 512 bytes, so each payload is a run of them,
+  // and `capacity` is the whole 131072-byte data area even though only 200 of
+  // the card's 256 blocks are ever handed to a save: what fits is capacity
+  // minus what the format reserves, which is the writer's arithmetic and not a
+  // field here. `system_area` is the card's own colour and icon, which belong
+  // to no save on it. The first entry is a mini-game, which runs in place from
+  // flash, so a writer puts it back at block 0 and keeps it contiguous; the
+  // dirent's type byte is what says so, and this format never reads inside it.
+  "vmu-card": bundle(map({ 1: "dreamcast", 4: map({ 0: "vmu", 1: 131072, 2: pattern(48, 67) }) }), [
+    nested(oneFileSave("dreamcast", SONIC, pattern(15360, 71)), {
+      id: 0,
+      role: "memcard-1",
+      path: "SONICADV__VM",
+      game: SONIC,
+      slot: 1,
+      dirent: pattern(32, 71),
+    }),
+    nested(oneFileSave("dreamcast", SONIC, pattern(4096, 73)), {
+      id: 1,
+      role: "memcard-1",
+      path: "SONICADV_INT",
+      game: SONIC,
+      slot: 2,
+      dirent: pattern(32, 73),
+    }),
+  ]),
+
+  // A Neo Geo memory card: the smallest card here, 2 KiB of 64-byte blocks
+  // behind a 4-byte directory entry. Nothing on this card has a name, because
+  // the entry holds the game's NGH number and a sub-number instead, so no
+  // entry carries a `path` and the two saves for one game are told apart by
+  // `slot` alone. That is the uniqueness rule at its limit: `role` and `path`
+  // agree, and `slot` is the only thing left that can separate them.
+  // `system_area` is the cardholder username, which belongs to the card rather
+  // than to anything saved on it.
+  "neogeo-card": bundle(map({ 1: "neogeo", 4: map({ 0: "neogeo-mc", 1: 2048, 2: pattern(16, 79) }) }), [
+    nested(oneFileSave("neogeo", METAL_SLUG, pattern(64, 83)), {
+      id: 0,
+      role: "neogeo-card",
+      game: METAL_SLUG,
+      slot: 1,
+      dirent: pattern(4, 83),
+    }),
+    nested(oneFileSave("neogeo", METAL_SLUG, pattern(128, 89)), {
+      id: 1,
+      role: "neogeo-card",
+      game: METAL_SLUG,
+      slot: 2,
+      dirent: pattern(4, 89),
+    }),
+  ]),
+
+  // A GameCube Memory Card 59: 64 blocks of 8192 bytes, named for the 59 left
+  // once the header, the directory and the block allocation table have taken
+  // theirs, and `capacity` is all 64 of them. Taken from a real `.gci`, which
+  // is a 64-byte dirent followed by the payload and nothing else: `GFZE` plus
+  // `8P` for the serial, `f_zero.dat` for the path, and 32768 bytes of save,
+  // which is the four blocks the dirent claims. That is the block count being
+  // derivable rather than stored. The same dirent gives the save's first block
+  // as 5, the first block a GameCube card has free, and this format drops that
+  // number on the floor: it is true of the card it was read from and of no
+  // other. F-Zero GX also signs its save against the destination card's flash
+  // serial and refuses one that does not match, so a writer re-signs it on
+  // arrival rather than copying the payload untouched.
+  "gc-card": bundle(map({ 1: "gc", 4: map({ 0: "gc-mc", 1: 524288 }) }), [
+    nested(oneFileSave("gc", FZERO, pattern(32768, 97)), {
+      id: 0,
+      role: "memcard-1",
+      path: "f_zero.dat",
+      game: FZERO,
+      slot: 1,
+      dirent: pattern(64, 97),
     }),
   ]),
 

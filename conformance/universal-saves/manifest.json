@@ -3,7 +3,7 @@
   "spec_version": "0.1",
   "generated_from": "test/bundles.js",
   "counts": {
-    "valid": 24,
+    "valid": 27,
     "invalid": 49
   },
   "cases": [
@@ -111,6 +111,27 @@
       "file": "valid/saturn-backup.cbor",
       "sha256": "af0d0fcfe61f0e3cf6fc0b6a50f658edd2e3626f48783c1a755f31e2670ab6d9",
       "note": "Saturn keeps a save's directory entry inside the save's own first block, so `saturn-bup` is the one card format where a card entry carries no `dirent` at all. A writer rewrites the block chain in the payload instead."
+    },
+    {
+      "name": "vmu-card",
+      "expect": "valid",
+      "file": "valid/vmu-card.cbor",
+      "sha256": "8728c8e47422453d202f70ca4967cdb52cc0a33d313e4e6627c953cf606ea951",
+      "note": "A Dreamcast VMU. Blocks are 512 bytes, so each payload is a run of them, and `capacity` is the whole 131072-byte data area even though only 200 of the card's 256 blocks are ever handed to a save: what fits is capacity minus what the format reserves, which is the writer's arithmetic and not a field here. `system_area` is the card's own colour and icon, which belong to no save on it. The first entry is a mini-game, which runs in place from flash, so a writer puts it back at block 0 and keeps it contiguous; the dirent's type byte is what says so, and this format never reads inside it."
+    },
+    {
+      "name": "neogeo-card",
+      "expect": "valid",
+      "file": "valid/neogeo-card.cbor",
+      "sha256": "3a1a0eba8918aa131883831d93e370d5f87bcc7dd0698fb9642042b4ffac0d13",
+      "note": "A Neo Geo memory card: the smallest card here, 2 KiB of 64-byte blocks behind a 4-byte directory entry. Nothing on this card has a name, because the entry holds the game's NGH number and a sub-number instead, so no entry carries a `path` and the two saves for one game are told apart by `slot` alone. That is the uniqueness rule at its limit: `role` and `path` agree, and `slot` is the only thing left that can separate them. `system_area` is the cardholder username, which belongs to the card rather than to anything saved on it."
+    },
+    {
+      "name": "gc-card",
+      "expect": "valid",
+      "file": "valid/gc-card.cbor",
+      "sha256": "7d20b489a336a0f1d90c35b48807a59e81b766395621c52a88650e8208b9e3cb",
+      "note": "A GameCube Memory Card 59: 64 blocks of 8192 bytes, named for the 59 left once the header, the directory and the block allocation table have taken theirs, and `capacity` is all 64 of them. Taken from a real `.gci`, which is a 64-byte dirent followed by the payload and nothing else: `GFZE` plus `8P` for the serial, `f_zero.dat` for the path, and 32768 bytes of save, which is the four blocks the dirent claims. That is the block count being derivable rather than stored. The same dirent gives the save's first block as 5, the first block a GameCube card has free, and this format drops that number on the floor: it is true of the card it was read from and of no other. F-Zero GX also signs its save against the destination card's flash serial and refuses one that does not match, so a writer re-signs it on arrival rather than copying the payload untouched."
     },
     {
       "name": "ps1-multi-block-save",
