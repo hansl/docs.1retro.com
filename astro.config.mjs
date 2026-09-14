@@ -54,6 +54,7 @@ export default defineConfig({
           label: "Specifications",
           items: [
             { slug: "specifications" },
+            { slug: "specifications/glossary" },
             { label: "Common Types", items: [{ autogenerate: { directory: "specifications/common-types" } }] },
             { label: "Extensions", items: [{ autogenerate: { directory: "specifications/extensions" } }] },
             { slug: "specifications/universal-saves-format" },
