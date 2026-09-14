@@ -5,7 +5,7 @@ slug: specifications/extensions/x.1sav.rtc.s3511a
 ---
 
 **Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header and a
-part · **Status:** normative schema, optional to carry
+part, never a `bundle` part · **Status:** normative schema, optional to carry
 
 The GBA's clock is a Seiko S-3511A on the cartridge. [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/) carries the
 instant a consumer needs to display it; this key carries what the chip itself holds, which is what a producer handing
@@ -38,6 +38,14 @@ How an emulator keeps the clock running between the moments a game reads it. One
 against the host clock, another holds an absolute base, and neither is chip state. A schema every producer has to
 satisfy can only require what the chip itself holds. An emulator with a model worth preserving carries it beside this
 key under a [name of its own](/specifications/common-types/reverse-dns-name/).
+
+## Where it goes
+
+Wherever [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/#where-it-goes) goes, and under the same prohibition: the
+[header](/specifications/universal-saves-format/#0-header-map) or a
+[part](/specifications/universal-saves-format/#part-map), never a
+[`bundle` part](/specifications/universal-saves-format/#nested-bundles). A producer carrying this key and `x.1sav.rtc`
+puts both in the same place, since they describe one clock.
 
 ## When to set it
 

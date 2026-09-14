@@ -5,7 +5,7 @@ slug: specifications/extensions/x.1sav.rtc.mbc3
 ---
 
 **Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header and a
-part · **Status:** normative schema, optional to carry
+part, never a `bundle` part · **Status:** normative schema, optional to carry
 
 An MBC3 cartridge keeps its clock in the save file, as a footer after the SRAM. Pokemon Gold, Silver and Crystal are
 where most people meet it. This key holds what a writer needs to put that footer back, which the SRAM bytes alone do not
@@ -47,6 +47,14 @@ byte the footer holds and the length it occupied, which is the whole of what reg
 [`x.1sav.rtc.s3511a`](/specifications/extensions/x.1sav.rtc.s3511a/) dates: it latches a year, a month, a day and a
 weekday, in BCD. This one counts, and knows nothing about the calendar. Neither shape can be read as the other, which is
 why each chip has a schema of its own.
+
+## Where it goes
+
+Wherever [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/#where-it-goes) goes, and under the same prohibition: the
+[header](/specifications/universal-saves-format/#0-header-map) or a
+[part](/specifications/universal-saves-format/#part-map), never a
+[`bundle` part](/specifications/universal-saves-format/#nested-bundles). A producer carrying this key and `x.1sav.rtc`
+puts both in the same place, since they describe one clock.
 
 ## When to set it
 

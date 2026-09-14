@@ -5,7 +5,7 @@ slug: specifications/extensions/x.1sav.rtc
 ---
 
 **Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header and a
-part · **Status:** normative schema, optional to carry
+part, never a `bundle` part · **Status:** normative schema, optional to carry
 
 A snapshot of the clock a game keeps, normalized so that any consumer can read it without knowing which chip produced
 it. Battery-backed clocks are a minority feature, so this is an extension key rather than a header field; what makes it
