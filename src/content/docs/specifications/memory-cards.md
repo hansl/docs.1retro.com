@@ -243,4 +243,5 @@ and inside that payload, the save itself:
 The directory's own entry is on the outer part, which is what a writer needs to recreate the directory with the right
 mode bits and timestamps. Each file's entry is on its own inner part. The outer payload is the three inner payloads plus
 the inner bundle's framing, most of which is the three 512-byte dirents. A card holding several PS2 saves repeats this
-arrangement once per save, and nothing has to infer where one save ends and the next begins.
+arrangement once per save, and nothing has to infer where one save ends and the next begins. The nesting is
+[required](/specifications/universal-saves-format/#nested-bundles) rather than a shape this page happens to choose.

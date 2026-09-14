@@ -373,6 +373,18 @@ The rules a decoder enforces:
   on a mismatch the inner header wins.
 - `content_type` SHOULD be omitted. It is `application/vnd.1saves+cbor` by construction.
 
+These arrangements are required rather than conventional. A `bundle` part is what says that its payload is one save, so
+a producer **MUST NOT** flatten that boundary away. A bundle whose header describes a container, a card or a collection
+of cards, carries what is inside it as `bundle` parts, and every save it splits out **MUST** be one of those rather than
+an ordinary part sitting beside the container's own. Where such a save is itself made of several files, those files
+**MUST** be parts of that save's own bundle and **MUST NOT** be parts of the container's. A producer holding only a
+byte-exact dump carries a [`card-image`](#part-kinds) and splits out no saves at all, which is a different thing from
+flattening one.
+
+No decoder can check this, which is why it sits outside the list above: three files of one save and three saves of one
+card are the same shape to a validator. A save flattened into its container has no bundle to hash, and so no
+[content hash](#content-hash-and-file-hash) to carry, slice out or compare against a copy.
+
 An outer part MAY use an external reference instead of embedding, which makes a **thin card**: a list of slots, dirents
 and content hashes, with the saves themselves resolved from a content-addressable store.
 
