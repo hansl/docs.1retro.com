@@ -1,0 +1,29 @@
+; ============================================================================
+; x.1sav.dirent.gc-mc - a GameCube directory entry, field by field
+;
+; An extension key for the Universal Saves Format, defined by these
+; specifications under a name reserved in the Vendor Names registry because a
+; GameCube entry has one layout and every tool that writes one writes it.
+;
+; The 64 bytes themselves are already carried verbatim in the part's `dirent`.
+; This key is the structured form, for the writer that has to build an entry
+; rather than copy one. Fields a writer regenerates are absent by design; the
+; page says which and why.
+;
+; The root here is the value carried under the key, not a bundle. A bundle
+; validates against the format's own schema whatever this holds, since an
+; extension value is `any` there; this file is what makes the shape checkable.
+; ============================================================================
+
+dirent-gc-mc = {
+    0 => tstr .size 4,        ; game_code       - 0x00, "GFZE"
+    1 => tstr .size 2,        ; maker_code      - 0x04, "01"
+    2 => bstr .size (1..32),  ; filename        - 0x08, unpadded
+    3 => uint .size 1,        ; banner_flags    - 0x07
+    4 => uint .size 2,        ; icon_format     - 0x30, two bits per icon
+    5 => uint .size 2,        ; anim_speed      - 0x32, two bits per frame
+    6 => uint .size 1,        ; permissions     - 0x34
+    7 => uint .size 1,        ; copy_counter    - 0x35
+  ? 8 => uint .size 4,        ; image_offset    - 0x2c, absent where 0xffffffff
+  ? 9 => uint .size 4,        ; comments_offset - 0x3c, absent where 0xffffffff
+}

@@ -1,0 +1,30 @@
+; ============================================================================
+; x.1sav.icon - the image a console shows for a save, decoded
+;
+; An extension key for the Universal Saves Format, defined by these
+; specifications under a name reserved in the Vendor Names registry because the
+; value belongs to no single producer.
+;
+; The root here is the value carried under the key, not a bundle. A bundle
+; validates against the format's own schema whatever this holds, since an
+; extension value is `any` there; this file is what makes the shape checkable.
+; ============================================================================
+
+icon = {
+    0 => [+ frame],   ; frames - in display order; a still icon is one frame
+  ? 1 => png,         ; banner - the wider still image, where a format keeps one
+}
+
+; A frame and how long it holds. The hold is absent on a still icon, and on a
+; format whose frames all run at one rate a producer repeats the same number
+; rather than inventing a second way to say it.
+frame = [
+    png,
+  ? uint,             ; hold_ms
+]
+
+; PNG, because a consumer that needs a per-format decoder to see the picture is
+; the consumer this key exists to spare. The ceiling is headroom: the largest of
+; these on real hardware is a GameCube banner at 96x32, and eight icon frames at
+; 32x32 beside it.
+png = bstr .size (1..65536)

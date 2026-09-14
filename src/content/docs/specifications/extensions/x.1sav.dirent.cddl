@@ -1,0 +1,27 @@
+; ============================================================================
+; x.1sav.dirent - what a card's directory records about one save
+;
+; An extension key for the Universal Saves Format, defined by these
+; specifications under a name reserved in the Vendor Names registry because the
+; value belongs to no single producer.
+;
+; The root here is the value carried under the key, not a bundle. A bundle
+; validates against the format's own schema whatever this holds, since an
+; extension value is `any` there; this file is what makes the shape checkable.
+; ============================================================================
+
+; Written as a choice rather than two optional keys so that an empty map is not
+; a valid value: a producer with neither time omits the key instead.
+dirent = {
+    0 => entry-seconds,     ; created_at  - when the directory dates the entry
+  ? 1 => entry-seconds,     ; modified_at - when the console last wrote it
+} / {
+    1 => entry-seconds,
+}
+
+; Whole seconds on the Unix scale, for the reason `created_at` gives in the
+; format spec: tag 1 admits a float, and allowing it would give one instant two
+; encodings. Directories count from wherever suits them, a GameCube entry from
+; 2000-01-01 and a Saturn entry in minutes from 1980-01-01, and converting that
+; once is the work this key exists to do.
+entry-seconds = #6.1(int)

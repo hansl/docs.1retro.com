@@ -1,0 +1,21 @@
+; ============================================================================
+; x.1sav.label - what a console calls a save, and what it says beneath that
+;
+; An extension key for the Universal Saves Format, defined by these
+; specifications under a name reserved in the Vendor Names registry because the
+; value belongs to no single producer.
+;
+; The root here is the value carried under the key, not a bundle. A bundle
+; validates against the format's own schema whatever this holds, since an
+; extension value is `any` there; this file is what makes the shape checkable.
+; ============================================================================
+
+label = {
+    0 => line,     ; title  - what the console lists this save as
+  ? 1 => line,     ; detail - what it says about the save beyond its name
+}
+
+; Byte length rather than character count, and "" is absence, the way `path`
+; has it in the format's own schema. The longest of these on real hardware is a
+; PS1 title at 64 bytes, so the ceiling is headroom and not a target.
+line = tstr .size (1..256)

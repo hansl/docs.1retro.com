@@ -41,6 +41,137 @@ export const extensions = {
     },
   },
 
+  // What the card's directory records: the pair of times and nothing else. The
+  // text and the picture are the save's, and sit on its own header.
+  "x.1sav.dirent": {
+    schema: `${DIR}/x.1sav.dirent.cddl`,
+    valid: {
+      // A PS2 entry dates the save and records the last write.
+      both: map({ 0: new Tag(1, 1044057600), 1: new Tag(1, 1044144000) }),
+      // A VMU entry has a creation time and no modify time; GameCube is the
+      // other way around. Each format carries the one it keeps.
+      "created-only": map({ 0: new Tag(1, 1044057600) }),
+      "modified-only": map({ 1: new Tag(1, 1044144000) }),
+    },
+    invalid: {
+      // A producer holding neither time omits the key, so an empty map, which
+      // would say nothing and still validate, is not one.
+      empty: map({}),
+      // Whole seconds, tagged, exactly as `x.1sav.rtc` carries an instant.
+      "created-untagged": map({ 0: 1044057600 }),
+      "modified-as-float": map({ 1: new Tag(1, new Float(1044057600.5)) }),
+      // The text is `x.1sav.label`'s. Carrying it here too would put one answer
+      // in two places, able to disagree.
+      "title-as-a-key": map({ 1: new Tag(1, 1044144000), 2: "F-ZERO GX" }),
+      "not-a-map": 1044057600,
+    },
+  },
+
+  // The write half of `x.1sav.dirent`: a GameCube entry as fields, named for
+  // the card format it decomposes.
+  "x.1sav.dirent.gc-mc": {
+    schema: `${DIR}/x.1sav.dirent.gc-mc.cddl`,
+    valid: {
+      full: map({
+        0: "GFZE",
+        1: "01",
+        2: pattern(12),
+        3: 2,
+        4: 5,
+        5: 21,
+        6: 4,
+        7: 0,
+        8: 0x2000,
+        9: 0x40,
+      }),
+      // A save with neither pictures nor comments holds 0xffffffff in both
+      // address fields, which this key says by leaving them out.
+      "without-offsets": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+    },
+    invalid: {
+      // Every fixed field of the entry is present in the 64 bytes, so none of
+      // them is optional here. Only the two addresses can be absent.
+      "without-game-code": map({ 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      "without-permissions": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 7: 0 }),
+      // The identifiers are fixed-width on the card, so a value that is not
+      // that width did not come off one.
+      "game-code-too-short": map({ 0: "GFZ", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      "maker-code-too-long": map({ 0: "GFZE", 1: "012", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      // Bytes rather than text, because a Shift-JIS name does not round-trip
+      // through `path`, which is UTF-8 by construction.
+      "filename-as-text": map({ 0: "GFZE", 1: "01", 2: "f-zero", 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      "filename-empty": map({ 0: "GFZE", 1: "01", 2: Buffer.alloc(0), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      "filename-too-long": map({ 0: "GFZE", 1: "01", 2: pattern(33), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0 }),
+      // The packed fields are as wide as the entry makes them: one byte for
+      // the flags and permissions, two for the icon format and speed.
+      "permissions-too-wide": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 256, 7: 0 }),
+      "icon-format-too-wide": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 65536, 5: 0, 6: 4, 7: 0 }),
+      // The fields a writer owns are not carried: `modtime` is normalized into
+      // `x.1sav.dirent`, and the block fields are regenerated and derived.
+      "modtime-as-a-key": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0, 10: 1044057600 }),
+      "block-count-as-a-key": map({ 0: "GFZE", 1: "01", 2: pattern(12), 3: 0, 4: 0, 5: 0, 6: 4, 7: 0, 11: 3 }),
+      "not-a-map": pattern(64),
+    },
+  },
+
+  // What the console calls a save, on the nested bundle's header because the
+  // text travels with the save when it is sliced out.
+  "x.1sav.label": {
+    schema: `${DIR}/x.1sav.label.cddl`,
+    valid: {
+      full: map({ 0: "F-ZERO GX", 1: "Save data" }),
+      // A PS1 title is one line and the save says nothing else about itself.
+      "title-only": map({ 0: "FF7 MIDGAR" }),
+    },
+    invalid: {
+      // The title is what a consumer lists, so a view without one has nothing
+      // to say that `path` did not already say.
+      "without-title": map({ 1: "Save data" }),
+      // Absence is how a producer says it has no text, as elsewhere in the
+      // format.
+      "title-empty": map({ 0: "" }),
+      "detail-empty": map({ 0: "F-ZERO GX", 1: "" }),
+      "title-as-bytes": map({ 0: pattern(9) }),
+      // The times are the card's record and live on the part, under
+      // `x.1sav.dirent`. They do not survive being sliced out; this key does.
+      "modified-as-a-key": map({ 0: "F-ZERO GX", 2: new Tag(1, 1044057600) }),
+      "not-a-map": "F-ZERO GX",
+    },
+  },
+
+  // What the console shows for a save, decoded. Separate from the label so a
+  // lister reading titles does not walk past kilobytes of PNG.
+  "x.1sav.icon": {
+    schema: `${DIR}/x.1sav.icon.cddl`,
+    valid: {
+      // A PS1 icon that does not animate: one frame, no hold.
+      still: map({ 0: [[pattern(64)]] }),
+      // A GameCube icon varies the hold per frame, so each carries its own.
+      animated: map({
+        0: [
+          [pattern(64), 250],
+          [pattern(64, 2), 125],
+        ],
+      }),
+      // The banner is a second picture beside the icon, not instead of it.
+      "with-banner": map({ 0: [[pattern(64)]], 1: pattern(256) }),
+    },
+    invalid: {
+      // The icon is the whole of what this key carries, so a banner alone is a
+      // value with nothing in it a consumer came for.
+      "banner-only": map({ 1: pattern(256) }),
+      "frames-empty": map({ 0: [] }),
+      // A frame is an array so it has somewhere to put its hold.
+      "frame-not-wrapped": map({ 0: [pattern(64)] }),
+      "frame-empty-image": map({ 0: [[Buffer.alloc(0)]] }),
+      "hold-negative": map({ 0: [[pattern(64), -1]] }),
+      "frame-with-third-element": map({ 0: [[pattern(64), 250, 1]] }),
+      "banner-as-text": map({ 0: [[pattern(64)]], 1: "banner.png" }),
+      "unknown-key": map({ 0: [[pattern(64)]], 2: "nope" }),
+      "not-a-map": pattern(64),
+    },
+  },
+
   // The GBA cartridge clock, spec-owned for the same reason: the S-3511A's
   // latched bytes are written the same way by everyone who keeps them.
   "x.1sav.rtc.s3511a": {
