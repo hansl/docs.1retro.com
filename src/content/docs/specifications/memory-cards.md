@@ -188,8 +188,8 @@ its files have entries of their own.
 
 ### A card of one game
 
-Fifteen Final Fantasy VII saves fill a PS1 card, and the shape above still holds. Three things about that card are worth
-knowing before you build one.
+Fifteen Final Fantasy VII saves fill a PS1 card, and the arrangement above still holds. Three things about that card are
+worth knowing before you build one.
 
 The `game` map appears sixteen times: once in each nested bundle, and once per outer part as the index copy. The inner
 copies are not removable. [Nothing is inherited](/specifications/bundle/#nested-bundles) across the nesting boundary,
@@ -242,4 +242,4 @@ The directory's own entry is on the outer part, which is what a writer needs to 
 mode bits and timestamps. Each file's entry is on its own inner part. The outer payload is the three inner payloads plus
 the inner bundle's framing, most of which is the three 512-byte dirents. A card holding several PS2 saves repeats this
 arrangement once per save, and nothing has to infer where one save ends and the next begins. The nesting is
-[required](/specifications/bundle/#nested-bundles) rather than a shape this page happens to choose.
+[required](/specifications/bundle/#nested-bundles) rather than an arrangement this page happens to choose.

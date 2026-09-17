@@ -4,8 +4,8 @@ description: What a console calls a save, and what it says about the save beneat
 slug: specifications/extensions/x.1sav.label
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header, and
-a part as an index copy · **Status:** normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a save's bundle header,
+and a part as an index copy · **Status:** normative schema, optional to carry
 
 What a console lists a save as, so a consumer can show a person a list of saves rather than a list of addresses. The
 name sits in the [`x` tree](/specifications/common-types/reverse-dns-name/#the-x-tree) because the value belongs to no

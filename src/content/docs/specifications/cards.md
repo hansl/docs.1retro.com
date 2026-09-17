@@ -28,7 +28,19 @@ in that save's own header, inside its nested bundle, where they stay correct onc
 
 ## Parts
 
-One [`bundle` part](/specifications/bundle/#nested-bundles) per save, plus whatever belongs to the card itself.
+One [`bundle` part](/specifications/bundle/#nested-bundles) per save, plus whatever belongs to the card itself:
+
+```text
+1SAV                                       the card
+├── header  { shape: "card", system, card: { format, capacity, system_area } }
+└── parts
+    ├── kind "bundle"  slot 1, dirent, path, game hint
+    │   └── 1SAV                           one save
+    │       ├── header  { shape: "save", system, game, description }
+    │       └── parts   one per file, each with its own slot and dirent
+    ├── kind "bundle"  slot 2, ...
+    └── kind "card-image"                  optional byte-exact archive
+```
 
 A save's part carries the card's record of that save, and only that:
 

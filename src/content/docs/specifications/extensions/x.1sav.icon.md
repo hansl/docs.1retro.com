@@ -4,8 +4,8 @@ description: The image a console shows for a save, decoded so any consumer can d
 slug: specifications/extensions/x.1sav.icon
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header ·
-**Status:** normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a save's bundle header
+· **Status:** normative schema, optional to carry
 
 The picture a console puts beside a save, decoded so a consumer can display it without knowing which card the save came
 off. [`x.1sav.label`](/specifications/extensions/x.1sav.label/) answers what the save is called; this answers what it

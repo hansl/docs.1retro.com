@@ -31,13 +31,13 @@ The `Applies to` column names every placement a key allows. Whether "part" inclu
 Registration is first-come and non-blocking; to add a key, open a PR with a new `extensions/<key>.md` page and a row in
 the table.
 
-| Key                                                                      | Owner  | Applies to            | Purpose                                                                   |
-| ------------------------------------------------------------------------ | ------ | --------------------- | ------------------------------------------------------------------------- |
-| [`com.1retro.forge`](/specifications/extensions/com.1retro.forge/)       | 1retro | header, part          | What a Forge parser found, and which parser found it.                     |
-| [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/)             | (spec) | part, `bundle` too    | When a card's directory dates a save and when it last wrote it.           |
-| [`x.1sav.dirent.gc-mc`](/specifications/extensions/x.1sav.dirent.gc-mc/) | (spec) | part, `bundle` too    | A GameCube directory entry, field by field, for a writer that builds one. |
-| [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/)                 | (spec) | header                | The image a console shows for a save, decoded to PNG.                     |
-| [`x.1sav.label`](/specifications/extensions/x.1sav.label/)               | (spec) | header; part as index | What a console calls a save, and what it says beneath that.               |
-| [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/)                   | (spec) | save header           | A clock reading normalized to a Unix instant.                             |
-| [`x.1sav.rtc.mbc3`](/specifications/extensions/x.1sav.rtc.mbc3/)         | (spec) | save header           | The clock an MBC3 Game Boy cartridge keeps.                               |
-| [`x.1sav.rtc.s3511a`](/specifications/extensions/x.1sav.rtc.s3511a/)     | (spec) | save header           | The latched state of a GBA cartridge's Seiko RTC.                         |
+| Key                                                                      | Owner  | Applies to                 | Purpose                                                                   |
+| ------------------------------------------------------------------------ | ------ | -------------------------- | ------------------------------------------------------------------------- |
+| [`com.1retro.forge`](/specifications/extensions/com.1retro.forge/)       | 1retro | header, part               | What a Forge parser found, and which parser found it.                     |
+| [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/)             | (spec) | part, `bundle` too         | When a card's directory dates a save and when it last wrote it.           |
+| [`x.1sav.dirent.gc-mc`](/specifications/extensions/x.1sav.dirent.gc-mc/) | (spec) | part, `bundle` too         | A GameCube directory entry, field by field, for a writer that builds one. |
+| [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/)                 | (spec) | save header                | The image a console shows for a save, decoded to PNG.                     |
+| [`x.1sav.label`](/specifications/extensions/x.1sav.label/)               | (spec) | save header; part as index | What a console calls a save, and what it says beneath that.               |
+| [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/)                   | (spec) | save header                | A clock reading normalized to a Unix instant.                             |
+| [`x.1sav.rtc.mbc3`](/specifications/extensions/x.1sav.rtc.mbc3/)         | (spec) | save header                | The clock an MBC3 Game Boy cartridge keeps.                               |
+| [`x.1sav.rtc.s3511a`](/specifications/extensions/x.1sav.rtc.s3511a/)     | (spec) | save header                | The latched state of a GBA cartridge's Seiko RTC.                         |

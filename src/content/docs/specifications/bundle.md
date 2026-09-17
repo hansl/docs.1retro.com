@@ -210,20 +210,8 @@ the bytes changes no behaviour, and describing the bytes is [`content_type`](#pa
 A `bundle` part's payload is a complete `1SAV` bundle, carried as an ordinary byte string. Nothing about the outer part
 changes: `sha256` is its hash, and `encoding` compresses it like any other blob.
 
-This is how a memory card holds its saves. One `bundle` part per save, carrying that save's `slot` and `dirent`, and
-inside it a bundle with the save's own `game` and one part per file:
-
-```text
-1SAV                                       the card
-├── header  { system, card: { format, capacity, system_area } }
-└── parts
-    ├── kind "bundle"  slot 1, dirent, path, game hint
-    │   └── 1SAV                           one save
-    │       ├── header  { system, game, description, com.1retro.forge }
-    │       └── parts   one per file, each with its own slot and dirent
-    ├── kind "bundle"  slot 2, ...
-    └── kind "card-image"                  optional byte-exact archive
-```
+This is how a [card](/specifications/cards/) holds its saves and a [collection](/specifications/collections/) holds its
+cards, and each of those pages draws its own arrangement.
 
 Grouping saves this way is structural rather than inferred, which matters because a card routinely holds several saves
 for the same game, carrying byte-identical `game` maps that only their nesting, `slot` and `path` tell apart. See
@@ -278,7 +266,7 @@ and content hashes, with the saves themselves resolved from a content-addressabl
 | 4   | `slot`         | uint        | no   | The index this part occupied in whatever container it came out of: a card's directory slot, an emulator's save-state slot. Display order, not an address. A writer that packs the parts into different slots has not done anything wrong.                                                                                                                                                  |
 | 5   | `dirent`       | byte string | no   | That container's own directory entry for this part, verbatim. Fully opaque: this spec never says what a byte inside it means, which is what keeps a card-format parser out of the container. Its length is fixed by the card's [`format`](#card-map), except on `saturn-bup`, which keeps its entry inside the save's first block and so omits this key.                                   |
 | 6   | `content_type` | text        | no   | Media type of the payload. No [kind](#part-kinds) requires it, but it is the only place the format says what a blob is, so set it whenever there is a registered type to name.                                                                                                                                                                                                             |
-| 7   | `encoding`     | text        | no   | `"zstd"` when the payload is compressed. Absent means `"none"`, which MUST NOT be written out. Compression is per-part.                                                                                                                                                                                                                                                                    |
+| 7   | `encoding`     | text        | no   | `"zstd"` when the payload is compressed. Absent means `"none"`, which MUST NOT be written out. Compression is per-part. A spec-owned [slug](/specifications/common-types/slug/) and the only one this version defines; another codec comes from a PR against this spec.                                                                                                                    |
 | 8   | `size`         | uint        | some | **Uncompressed** byte length of the payload. Carried only where it cannot be derived: when the payload is `zstd` or an external reference. MUST be absent otherwise, since an embedded uncompressed payload already states its own length.                                                                                                                                                 |
 | 9   | `sha256`       | tagged bstr | yes  | SHA-256 over the **uncompressed** payload, as a [hash value](/specifications/common-types/hash-value/): 32 bytes under tag `18540`. Only that tag is legal, so identity and dedup have one answer; the tag is there so a generic CBOR tool can name the digest without knowing this format.                                                                                                |
 | 10  | `source`       | map         | no   | Who produced this part's bytes, when that differs from the bundle's [`source`](#source-map). Same shape as the header map. Absent means the header's source applies.                                                                                                                                                                                                                       |
