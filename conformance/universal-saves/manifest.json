@@ -225,7 +225,7 @@
       "expect": "invalid",
       "rejected_by": "schema",
       "file": "invalid/shape-unknown.cbor",
-      "sha256": "5830f109795731473b3b99d222e718605dfb9676ec2c2c47fe9ab5f011d6442f",
+      "sha256": "65179fbf7ea22c41047e2659ed1a7ab03f0cee02597e66c3873bd53145242e3e",
       "note": "`shape` says which document governs the bundle, so it is the one header key that is never optional and never inferred."
     },
     {
@@ -233,7 +233,7 @@
       "expect": "invalid",
       "rejected_by": "schema",
       "file": "invalid/shape-as-integer.cbor",
-      "sha256": "541b4a41107a3cd923a3dd7bcac2cd5ce138bcb075150cb2d526cc4ff25b01ea",
+      "sha256": "f3f9477577902a37b766fa309e440419d15945d7d2a25aef70280b22db36242d",
       "note": "`shape` says which document governs the bundle, so it is the one header key that is never optional and never inferred."
     },
     {

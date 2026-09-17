@@ -512,8 +512,8 @@ export const invalid = {
   // `shape` says which document governs the bundle, so it is the one header key
   // that is never optional and never inferred.
   "header-without-shape": bundle(new Map(), [part()]),
-  "shape-unknown": bundle(map({ 6: "save-state" }), [part()]),
-  "shape-as-integer": bundle(map({ 6: 0 }), [part()]),
+  "shape-unknown": bundle(map({ 0: "save-state" }), [part()]),
+  "shape-as-integer": bundle(map({ 0: 0 }), [part()]),
 
   // Each shape admits a different header. A card is a card because it carries
   // the `card` map, a save never carries one, and a collection has nothing of
