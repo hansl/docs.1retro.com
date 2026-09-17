@@ -4,8 +4,8 @@ description: A GameCube memory card directory entry, field by field, for the wri
 slug: specifications/extensions/x.1sav.dirent.gc-mc
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a part · **Status:**
-normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a card's part ·
+**Status:** normative schema, optional to carry
 
 The 64 bytes a GameCube memory card keeps for one save, as fields rather than as a blob. This is the write half of
 [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/), which normalizes the two times any card records but does

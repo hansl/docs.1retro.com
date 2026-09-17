@@ -55,6 +55,9 @@ A save's part carries the card's record of that save, and only that:
 Card-level parts sit beside those: a [`card-image`](/specifications/bundle/#part-kinds) for a byte-exact archive of the
 whole medium, and `aux` for anything else binary that belongs to the card rather than to a save.
 
+A card's nested bundles are saves and nothing else. It holds no card, no device and no collection, which is what makes a
+card the last tier that nests: below it there are only a save's own parts.
+
 A save's files are **not** parts of the card. They are parts of that save's own bundle, which is
 [required and not conventional](/specifications/bundle/#nested-bundles): a save flattened into its card has no bundle to
 hash, and so no identity.

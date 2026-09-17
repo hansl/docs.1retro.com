@@ -30,9 +30,11 @@ because a device is not a card even when it holds one.
 
 ## Parts
 
-Every part is a [`bundle` part](/specifications/bundle/#nested-bundles), one per component, and each carries a
-[`role`](/registries/roles/) naming where that component sits: `internal`, `cartridge`, `memcard-1`. The role is what a
-writer puts the component back by, so it is the one field a device's part cannot omit.
+Every part is a [`bundle` part](/specifications/bundle/#nested-bundles), one per component, and every part **MUST**
+carry a [`role`](/registries/roles/) naming where that component sits: `internal`, `cartridge`, `memcard-1`. The role is
+what a writer puts the component back by. Writing it is required rather than merely advised, because `role` otherwise
+[defaults to `primary`](/specifications/bundle/#part-map), and two components that both fell back to it would be a
+device whose halves a consumer cannot tell apart.
 
 ```text
 1SAV                                       { shape: "device", system: "segacd" }

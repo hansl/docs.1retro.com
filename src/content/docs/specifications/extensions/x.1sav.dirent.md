@@ -4,8 +4,8 @@ description: What a card's directory records about one save, normalized to a Uni
 slug: specifications/extensions/x.1sav.dirent
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a part · **Status:**
-normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a card's or save's part
+· **Status:** normative schema, optional to carry
 
 When a card's directory dates a save and when it says the console last wrote it, on a scale a consumer can read without
 knowing how that card counts time. The entry itself is carried verbatim in [`dirent`](/specifications/bundle/#part-map),
@@ -28,10 +28,14 @@ keeps its date inside the save rather than in a directory.
 
 ## Where it goes
 
-The part that stands for one entry in a card's directory: on a card the
-[`bundle` part](/specifications/bundle/#nested-bundles) holding the save, and inside a PS2 save the inner part carrying
-each file. These times are the card's record and do not survive the save being sliced out, which is why they sit beside
-the raw `dirent` bytes rather than in the save's own header.
+The part that stands for one entry in a directory, which is two places and no others: a [card](/specifications/cards/)'s
+[`bundle` part](/specifications/bundle/#nested-bundles) holding a save, and a [save](/specifications/saves/)'s own part
+where the save is a directory, as a PS2 save's files are. These times are the directory's record and do not survive the
+save being sliced out, which is why they sit beside the raw `dirent` bytes rather than in the save's own header.
+
+It does not go on a [device](/specifications/device/)'s part or a [collection](/specifications/collections/)'s. Those
+parts are components and entries, which sit in a socket and in a file rather than in a directory, and neither has an
+entry to normalize.
 
 What does survive is scoped the other way. [`x.1sav.label`](/specifications/extensions/x.1sav.label/) and
 [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/) sit on the nested bundle's header, and

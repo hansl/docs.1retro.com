@@ -5,7 +5,7 @@ slug: specifications/extensions/x.1sav.label
 ---
 
 **Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a save's bundle header,
-and a part as an index copy · **Status:** normative schema, optional to carry
+and a card's part as an index copy · **Status:** normative schema, optional to carry
 
 What a console lists a save as, so a consumer can show a person a list of saves rather than a list of addresses. The
 name sits in the [`x` tree](/specifications/common-types/reverse-dns-name/#the-x-tree) because the value belongs to no
@@ -41,9 +41,11 @@ The [header](/specifications/bundle/#0-header-map) of the bundle that is the sav
 save when it is sliced out. [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/) sits on the part instead, being
 the card's record rather than the save's.
 
-A producer **MAY** repeat the key on the [`bundle` part](/specifications/bundle/#nested-bundles) carrying the save, as
-an index copy so a consumer can list a card without stepping into payloads. Producers **SHOULD** keep the two
-consistent, and on a mismatch the inner header wins.
+A producer **MAY** repeat the key on a [card](/specifications/cards/)'s
+[`bundle` part](/specifications/bundle/#nested-bundles) carrying the save, as an index copy so a consumer can list a
+card without stepping into payloads. Nowhere else: a [device](/specifications/device/) has a handful of components
+rather than a directory to list, and a [collection](/specifications/collections/) already indexes its entries with
+`system` and `game`. Producers **SHOULD** keep the two consistent, and on a mismatch the inner header wins.
 
 A consumer holding both this key and a [`description`](/specifications/bundle/#0-header-map) **SHOULD** show `title`,
 and **MUST NOT** treat a `description` that disagrees as malformed. One is what the console called the save, the other a
