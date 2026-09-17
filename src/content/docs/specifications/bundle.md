@@ -186,7 +186,7 @@ A part's `kind` (key 1) says what role its bytes play. It is absent on the commo
 | _(absent)_   | `save`. The vast majority of parts are save data, so the common case carries no kind at all.                                                                                                                                                       |
 | `card-image` | A complete memory-card image, kept whole instead of split into its saves (PS1 and PS2 memcards, N64 controller pak, GameCube memory card, Dreamcast VMU). Handled like a save; `content_type` optional, since these rarely have a registered type. |
 | `bundle`     | The payload is itself a complete `1SAV` bundle. This is how a card holds its saves. See [Nested bundles](#nested-bundles).                                                                                                                         |
-| `aux`        | Anything else binary. `content_type` SHOULD be set.                                                                                                                                                                                                |
+| `aux`        | Opaque binary: the format carries it and never reads it. This is also where an unrecognized kind lands, so it is the handling every kind a consumer has not heard of falls back to. `content_type` SHOULD be set.                                  |
 
 A `card-image` says the blob is a whole card rather than one game's save, so a consumer knows to stop reading the
 bundle's `game` as a description of its contents.
@@ -194,6 +194,11 @@ bundle's `game` as a description of its contents.
 A producer MAY carry both: the image as a byte-exact archive of one physical card, and that card's saves as `bundle`
 parts for portability. Keeping the image alongside the split saves is how a producer preserves what splitting drops; see
 [`system_area`](#card-map).
+
+`aux` is the escape hatch that keeps the vocabulary small. A producer with a blob the format has no name for carries it
+as `aux` with a `content_type` rather than minting a kind, because a name that only describes the bytes changes nothing
+about how a consumer handles them, and a minted kind a consumer does not recognise is handled as `aux` in the end
+anyway. Screenshots, box art and the container file a bundle was read from all belong here.
 
 ##### Minting a kind
 
