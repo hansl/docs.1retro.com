@@ -52,9 +52,9 @@ empty-container rules, on `game_id`, `rom_hashes` and `parts`, are all `+` here 
 
 Nested bundles add four more, all of them beyond what a schema can see because CDDL does not reach inside a byte string:
 a `bundle` part's payload decoding as a `saves-file` at all, that inner bundle being normalized (every part every inner
-part uncompressed, every payload embedded), the outer part's `sha256` equaling the inner bundle's hash, and the nesting
-depth limit. Everything about the encoding itself is checkable, since the bundle follows RFC 8949 section 4.2 with no
-exceptions of its own.
+part uncompressed, every payload embedded), the outer part's `sha256` equaling the inner bundle's hash, and each nested
+bundle's shape being one the holding shape may contain. Everything about the encoding itself is checkable, since the
+bundle follows RFC 8949 section 4.2 with no exceptions of its own.
 
 ```cddl file=./universal-saves-format.cddl
 

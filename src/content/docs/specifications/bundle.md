@@ -227,11 +227,12 @@ The rules a decoder enforces:
   call it.
 - **Nothing is inherited.** An inner bundle does not read `system`, `game` or `source` from the enclosing header. It
   means the same thing sliced out as it does in place, which is the entire point.
-- **Depth is capped at 2.** A bundle's own parts are depth 0, a nested bundle's are depth 1, and one nested inside that
-  is depth 2. Put the other way: a `bundle` part may sit at depth 0 or depth 1 and never at depth 2. Anything deeper is
-  malformed, and decoders MUST enforce it so recursion stays bounded. A save, a [card](#card-map) and a
-  [collection](/specifications/universal-saves-format/#shapes) of cards are what fills all three tiers; they are the
-  deepest shapes, not the only ones.
+- **What a bundle may hold follows from its shape**, and decoders MUST enforce it. A
+  [collection](/specifications/collections/) holds any shape but another collection, a [device](/specifications/device/)
+  holds cards and saves, a [card](/specifications/cards/) holds saves, and a [save](/specifications/saves/) holds no
+  nested bundle at all. Nothing in that chain leads back to itself, so a decoder that checks each nested bundle against
+  the shape of the one holding it terminates without counting levels, and no depth limit has to be written down to be
+  true.
 - **A bundle's parts need not be all one thing.** A `bundle` part sits beside ordinary save parts in the same array
   whenever a producer has both. See [Shapes](/specifications/universal-saves-format/#shapes).
 - **The outer `game` and `system` are an index.** They repeat what the inner header says so a consumer can list a card's

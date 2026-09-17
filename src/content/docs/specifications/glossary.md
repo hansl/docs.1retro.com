@@ -31,9 +31,9 @@ Non-normative. Each entry points at the text that defines the term, and that tex
   per part and told apart by `role`. `system` is required, which is what separates it from a collection.
 - **Collection.** The [`collection` shape](/specifications/collections/): every part a `bundle` part, and no `system`,
   `game` or `card` of its own. It is how one file spans systems.
-- **Mixed bundle.** A `save` whose parts include a `bundle` part: one game whose state spans two media.
-- **Depth.** How far a bundle sits inside another. A bundle's own parts are depth 0, a nested bundle's are depth 1, and
-  one nested inside that is depth 2. A `bundle` part never sits at depth 2.
+- **Containment.** Which shapes a bundle may hold, which follows from its own: a collection holds any shape but a
+  collection, a device holds cards and saves, a card holds saves, and a save holds nothing nested. The chain never leads
+  back to itself, so how deep a file goes is a consequence of what is in it rather than a limit the spec sets.
 
 ## Addressing a part
 

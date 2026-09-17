@@ -123,12 +123,12 @@ never seen. Each field in [Bundle](/specifications/bundle/) says which kind it h
 [`shape`](/specifications/bundle/#0-header-map) names one of four, and each has a document that defines what its parts
 mean:
 
-| Shape                                        | The bundle is                       | Its parts are                                       |
-| -------------------------------------------- | ----------------------------------- | --------------------------------------------------- |
-| [`save`](/specifications/saves/)             | one game's state                    | the regions or files that state is made of          |
-| [`card`](/specifications/cards/)             | one memory card                     | one `bundle` part per save, and the card's own      |
-| [`device`](/specifications/device/)          | one console's storage, read whole   | one `bundle` part per component, each with a `role` |
-| [`collection`](/specifications/collections/) | several cards and saves in one file | one `bundle` part per card or save                  |
+| Shape                                        | The bundle is                     | Its parts are                                           |
+| -------------------------------------------- | --------------------------------- | ------------------------------------------------------- |
+| [`save`](/specifications/saves/)             | one game's state                  | the regions or files that state is made of              |
+| [`card`](/specifications/cards/)             | one memory card                   | one `bundle` part per save, and the card's own          |
+| [`device`](/specifications/device/)          | one console's storage, read whole | one `bundle` part per component, each with a `role`     |
+| [`collection`](/specifications/collections/) | several bundles in one file       | one `bundle` part per entry, any shape but a collection |
 
 A decoder reads `shape` rather than inferring it from what the header happens to carry. The vocabulary is spec-owned,
 and a later minor version assigns a new one with a document to go with it.

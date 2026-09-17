@@ -256,8 +256,8 @@ export const valid = {
   // One game whose state spans a cartridge and a memory card, which is neither
   // a card (the bundle is not one) nor a collection (it has a system and a
   // game). Mixing a plain save part with a `bundle` part is what covers it.
-  "cartridge-and-card": bundle(map({ 0: "save", 1: "n64", 2: MK64 }), [
-    part({ id: 0, role: "cartridge", payload: pattern(512, 21) }),
+  "cartridge-and-pak": bundle(map({ 0: "device", 1: "n64" }), [
+    nested(oneFileSave("n64", MK64, pattern(512, 21)), { id: 0, role: "cartridge" }),
     nested(
       bundle(map({ 0: "card", 1: "n64", 4: map({ 0: "n64-cpak", 1: 32768, 2: pattern(32, 9) }) }), [
         nested(oneFileSave("n64", MK64, pattern(256)), {
@@ -807,9 +807,22 @@ export const malformedStructure = {
     })(),
   ]),
 
-  // Depth is capped at 2: a collection of cards of saves fills all three tiers,
-  // and a `bundle` part inside the third is one level too far.
-  "nested-deeper-than-two": bundle(map({ 0: "collection" }), [nested(valid.collection, { id: 0 })]),
+  // A collection is the one shape that does not nest inside itself, which is
+  // what keeps the chain of shapes from running forever.
+  "collection-in-a-collection": bundle(map({ 0: "collection" }), [nested(valid.collection, { id: 0 })]),
+
+  // A save holds no nested bundle: a component that is a card of its own makes
+  // the bundle a device.
+  "save-holding-a-bundle-part": bundle(map({ 0: "save", 1: "n64", 2: MK64 }), [
+    part({ id: 0, role: "cartridge", payload: pattern(512, 21) }),
+    nested(
+      bundle(map({ 0: "card", 1: "n64", 4: map({ 0: "n64-cpak", 1: 32768 }) }), [part({ payload: pattern(256) })]),
+      {
+        id: 1,
+        role: "controller-pak-1",
+      },
+    ),
+  ]),
 
   // No two parts may agree on `role`, `path` and `slot` together, and with all
   // three defaulting to absence two bare parts collide on every one of them.

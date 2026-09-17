@@ -21,7 +21,9 @@ system, no single game and no card: each of those belongs to an entry.
 ## Parts
 
 Every part is a [`bundle` part](/specifications/bundle/#nested-bundles), one per entry, and each entry is a complete
-[card](/specifications/cards/) or [save](/specifications/saves/).
+bundle of any shape but another collection: a [save](/specifications/saves/), a [card](/specifications/cards/) or a
+[device](/specifications/device/). A collection is the one shape that does not nest inside itself, which is what stops
+the format recursing without end.
 
 ```text
 1SAV                                       shape "collection"
@@ -35,8 +37,6 @@ Every part is a [`bundle` part](/specifications/bundle/#nested-bundles), one per
         └── 1SAV  { shape: "save", game: { … } }
 ```
 
-Entries need not all be the same tier, as above.
-
 Entries need not be the same shape. A collection can hold a PS1 card, a PS2 card and a loose Game Boy save side by side,
 and a consumer reads each entry's own `shape` to know which it has.
 
@@ -44,8 +44,12 @@ The outer part's `system` and `game` repeat what the entry's own header says, so
 the head region without opening payloads. They are an index: producers **SHOULD** keep them consistent, and the inner
 header wins on a mismatch.
 
-## Depth
+## What a collection may hold
 
-A collection may hold cards, and a card holds saves, which is the deepest the format goes. Nesting is
-[capped at two](/specifications/bundle/#nested-bundles), so a collection of collections is malformed. Two cards out of
-the same console are one collection of two card bundles, not a collection of collections.
+Any shape but another collection, which is the one rule that keeps the format from recursing. A collection holds
+devices, cards and saves; a device holds cards and saves; a card holds saves; a save holds nothing nested. Follow that
+chain and it always ends, so [how deep a bundle goes](/specifications/bundle/#nested-bundles) is a consequence of the
+shapes in it rather than a number this spec has to fix.
+
+Two cards out of the same console are one collection of two card bundles. Two consoles' storage in one file is a
+collection of two [devices](/specifications/device/).

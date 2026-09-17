@@ -67,31 +67,19 @@ canonical CBOR meets it without doing anything special.
 Three cases need it, and a producer that does not meet them should not reach for it.
 
 - **Several sockets.** One game whose state spans two places on the same system: 3DS savedata in `sysnand` beside
-  extdata on `sd`, or an N64 cartridge save beside a Controller Pak. [`role`](/registries/roles/) tells them apart, and
-  the pak is a [`bundle` part](/specifications/bundle/#nested-bundles) because it is a card of its own.
+  extdata on `sd`, or an N64 cartridge save beside that game's note in a Controller Pak. [`role`](/registries/roles/)
+  tells them apart.
 - **Several files.** A PS2 save is a directory and a 3DS extdata save is a folder.
   [`path`](/specifications/bundle/#part-map) tells those apart.
 - **Anything else binary.** An [`aux` part](/specifications/bundle/#part-kinds) with a `content_type`.
 
-A `save` may itself hold a `bundle` part, which is how one game's state spans two media. An N64 game keeps progress in
-the cartridge's battery SRAM and its ghosts in a Controller Pak, both belonging to one game on one system, so the shape
-stays `save` and the pak nests:
+A save's parts are never [`bundle` parts](/specifications/bundle/#nested-bundles). One game's note in a Controller Pak
+is an ordinary part, told apart by its `role`; the whole pak is a card in its own right, and a dump holding both the
+cartridge and the whole pak is a [device](/specifications/device/), because it is two storage components rather than one
+game's bytes.
 
-```text
-1SAV                                       { shape: "save", system: "n64", game: "Mario Kart 64" }
-└── parts
-    ├── role "cartridge"                   the battery save, an ordinary part
-    └── kind "bundle"  role "controller-pak-1"
-        └── 1SAV  { shape: "card", card: { format: "n64-cpak", … } }
-            └── parts   kind "bundle" per note
-```
-
-Nesting the pak rather than keeping it as a [`card-image`](/specifications/bundle/#part-kinds) buys per-note addressing
-and a place for the pak's `system_area`, both of which a whole-image part gives up.
-
-The same arrangement covers one system's software wrapping another's save, which is two systems and therefore two
-bundles rather than one [`system`](/specifications/bundle/#0-header-map) field forced to choose. A Wii Virtual Console
-save is a `wii` bundle whose one `bundle` part has an inner header saying `nes`.
+One system's software wrapping another's save is not a nesting either. A Wii Virtual Console save of an NES game is an
+`nes` save, the same as any other, and what wrapped it is [`source`](/specifications/bundle/#source-map) provenance.
 
 No two parts may agree on `role`, `path` and `slot` together, which is
 [how a consumer names one](/specifications/bundle/#part-map).
@@ -121,5 +109,5 @@ lets the user associate it later.
 ## What a saves producer can ignore
 
 The `card` map, `slot`, `dirent` and directory entries belong to [Cards](/specifications/cards/). Nesting, content
-hashes against file hashes, and the depth cap matter only where a bundle holds another one. A producer writing single
-saves needs none of it.
+hashes against file hashes, and what a shape may hold matter only where a bundle holds another one. A producer writing
+single saves needs none of it.

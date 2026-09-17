@@ -4,7 +4,7 @@
   "generated_from": "test/bundles.js",
   "counts": {
     "valid": 28,
-    "invalid": 62
+    "invalid": 63
   },
   "cases": [
     {
@@ -85,10 +85,10 @@
       "note": "A save the console bound to itself. The bytes are valid and worth keeping, and they will not restore to another console, which is the one thing a consumer cannot work out from the payload."
     },
     {
-      "name": "cartridge-and-card",
+      "name": "cartridge-and-pak",
       "expect": "valid",
-      "file": "valid/cartridge-and-card.cbor",
-      "sha256": "766bcd4a0d6d34a3cff3fc8a28c09ebf1a2ca64faf86cb35e1aea86a068a15a1",
+      "file": "valid/cartridge-and-pak.cbor",
+      "sha256": "2a6302f15394a1d4b07738599e419b48900ff078eb0c103dbcde37e5cd591758",
       "note": "One game whose state spans a cartridge and a memory card, which is neither a card (the bundle is not one) nor a collection (it has a system and a game). Mixing a plain save part with a `bundle` part is what covers it."
     },
     {
@@ -684,12 +684,20 @@
       "note": "The outer sha256 is the inner bundle's identity, which is what makes extracting a save a byte copy. Here it names bytes the payload is not."
     },
     {
-      "name": "nested-deeper-than-two",
+      "name": "collection-in-a-collection",
       "expect": "invalid",
       "rejected_by": "structure",
-      "file": "invalid/nested-deeper-than-two.cbor",
+      "file": "invalid/collection-in-a-collection.cbor",
       "sha256": "41c3797e8ea78165132cccdf3cf6800b91d9ca1231204c8a1474f9156dfe7703",
-      "note": "Depth is capped at 2: a collection of cards of saves fills all three tiers, and a `bundle` part inside the third is one level too far."
+      "note": "A collection is the one shape that does not nest inside itself, which is what keeps the chain of shapes from running forever."
+    },
+    {
+      "name": "save-holding-a-bundle-part",
+      "expect": "invalid",
+      "rejected_by": "structure",
+      "file": "invalid/save-holding-a-bundle-part.cbor",
+      "sha256": "76bfc65c37e0cfa5272ae890e7f36cb3d97bb0a56a1abaf91225ba384ea82126",
+      "note": "A save holds no nested bundle: a component that is a card of its own makes the bundle a device."
     },
     {
       "name": "parts-share-an-address",

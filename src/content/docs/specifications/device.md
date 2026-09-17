@@ -44,8 +44,13 @@ writer puts the component back by, so it is the one field a device's part cannot
 ```
 
 A component with a directory is a `card`; a flat one is a `save`, carrying no `game` where it holds saves for several.
-No two parts may share a `role`, which is the ordinary [addressing rule](/specifications/bundle/#part-map) and here is
-the whole of what keeps two components apart.
+Those are the only two, since a device holds no device and no collection. No two parts may share a `role`, which is the
+ordinary [addressing rule](/specifications/bundle/#part-map) and here is the whole of what keeps two components apart.
+
+A device is also where a dump lands that holds one game's storage across two components rather than a whole console's.
+An N64 cartridge save beside the whole Controller Pak is a device: the pak is a card of its own, holding notes for games
+the cartridge knows nothing about. Carry only that game's note instead and there is no device, just a
+[save](/specifications/saves/) with two ordinary parts.
 
 ## Merging two devices
 
