@@ -70,6 +70,27 @@ defined [deterministic form](https://datatracker.ietf.org/doc/html/rfc8949#name-
   [hash values](/specifications/common-types/hash-value/). What deterministic encoding does not settle at all is a data
   model that can say one thing two ways; see [One encoding per bundle](#one-encoding-per-bundle).
 
+### Semantics, not bytes
+
+What a bundle preserves is what the hardware reads, not the bytes it was read from. Two dumps of one card that differ
+only where nothing looks are the same save, and a bundle written from either says the same thing.
+
+That is why so much of this format declines to carry what it could. Block positions are
+[not stored](/specifications/memory-cards/#why-there-are-no-block-positions), because the number is wrong the moment the
+save lands on another card. Block counts are not stored, because the payload's length and the format's block size
+already give them. A writer [regenerates](/specifications/memory-cards/#what-a-writer-regenerates) every chain, table,
+mirror and checksum rather than reading them back, and `capacity` counts the data area rather than the length of a dump.
+None of those is a space optimisation. Each is a field that could disagree with the bytes, removed so that it cannot.
+
+A producer that wants the original file kept anyway attaches it as a part, where it gets a digest and can be compressed
+or resolved from a store like any other payload: a [`card-image`](/specifications/bundle/#part-kinds) for a whole card,
+an [`aux` part](/specifications/bundle/#part-kinds) with a `content_type` for a container this format has no name for.
+That is archival, riding alongside, and a consumer that rebuilds from the parts never has to consult it.
+
+Where bytes are carried verbatim, it is because nothing has decoded them and so nobody can say which of them are read.
+[`dirent`](/specifications/bundle/#part-map) and [`system_area`](/specifications/bundle/#card-map) are that case, not
+exceptions to this rule: the format holds them whole precisely because it cannot tell what inside them matters.
+
 ### One encoding per bundle
 
 A bundle's [content hash](/specifications/bundle/#content-hash-and-file-hash) is the identifier a store keys on and the
