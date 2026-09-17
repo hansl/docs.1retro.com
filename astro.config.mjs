@@ -55,10 +55,24 @@ export default defineConfig({
           items: [
             { slug: "specifications" },
             { slug: "specifications/glossary" },
+            {
+              // One group per specification. Everything scoped to the saves
+              // format lives under it, extension keys and card facts included;
+              // Common Types stays outside because more than one spec uses it.
+              // Pages directly under specifications/ are listed by hand here,
+              // since Starlight only autogenerates a group from a directory.
+              label: "Universal Saves Format",
+              items: [
+                { slug: "specifications/universal-saves-format" },
+                { slug: "specifications/bundle" },
+                { slug: "specifications/saves" },
+                { slug: "specifications/cards" },
+                { slug: "specifications/collections" },
+                { slug: "specifications/memory-cards" },
+                { label: "Extensions", items: [{ autogenerate: { directory: "specifications/extensions" } }] },
+              ],
+            },
             { label: "Common Types", items: [{ autogenerate: { directory: "specifications/common-types" } }] },
-            { label: "Extensions", items: [{ autogenerate: { directory: "specifications/extensions" } }] },
-            { slug: "specifications/universal-saves-format" },
-            { slug: "specifications/memory-cards" },
           ],
         },
         {

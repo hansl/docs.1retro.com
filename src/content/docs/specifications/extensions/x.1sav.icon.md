@@ -34,21 +34,20 @@ where a writer reads them through the format's own key.
 
 ## Where it goes
 
-The [header](/specifications/universal-saves-format/#0-header-map) of the bundle that is the save, because the image
-bytes are in the save's payload and travel with it: PS1 in the first block, VMU in the VMS header, GameCube at the image
-address the directory entry points to.
+The [header](/specifications/bundle/#0-header-map) of the bundle that is the save, because the image bytes are in the
+save's payload and travel with it: PS1 in the first block, VMU in the VMS header, GameCube at the image address the
+directory entry points to.
 
-An [`aux` part](/specifications/universal-saves-format/#part-kinds) is not the place. Beside the save it is linked only
-by inference from `slot` and `path`; inside the save's own bundle it joins that bundle's
-[content hash](/specifications/universal-saves-format/#content-hash-and-file-hash), which is the save's identity.
+An [`aux` part](/specifications/bundle/#part-kinds) is not the place. Beside the save it is linked only by inference
+from `slot` and `path`; inside the save's own bundle it joins that bundle's
+[content hash](/specifications/bundle/#content-hash-and-file-hash), which is the save's identity.
 
 ## What does not go here
 
 - **Native pixel data.** Decode it, or omit the key.
 - **A PS2 save's icon.** `icon.sys` and the `.ico` files it names are already parts inside the save's bundle, each with
   its own `path`, `slot` and `dirent`, and a `.ico` is a 3D model rather than a picture.
-- **Screenshots and box art.** An [`aux` part](/specifications/universal-saves-format/#part-kinds) with a
-  `content_type`.
+- **Screenshots and box art.** An [`aux` part](/specifications/bundle/#part-kinds) with a `content_type`.
 - **The icon's native format, palette or animation flags.** The format's own key, such as
   [`x.1sav.dirent.gc-mc`](/specifications/extensions/x.1sav.dirent.gc-mc/).
 

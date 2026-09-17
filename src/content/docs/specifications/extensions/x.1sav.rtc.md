@@ -4,8 +4,8 @@ description: A real-time clock reading normalized to a Unix instant, for the gam
 slug: specifications/extensions/x.1sav.rtc
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header and a
-part, never a `bundle` part · **Status:** normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a save's bundle header
+· **Status:** normative schema, optional to carry
 
 A snapshot of the clock a game keeps, normalized so that any consumer can read it without knowing which chip produced
 it. Battery-backed clocks are a minority feature, so this is an extension key rather than a header field; what makes it
@@ -21,13 +21,13 @@ make one vendor the owner of a value the whole format shares.
 
 ```
 
-`reading` is whole seconds, for the reason [`created_at`](/specifications/universal-saves-format/#0-header-map) gives:
-tag 1 admits a float, and leaving the choice open would give one instant two encodings. `accuracy_ms` gives the
-uncertainty of the reading, and is omitted when a producer has nothing useful to say about it.
+`reading` is whole seconds, for the reason [`created_at`](/specifications/bundle/#0-header-map) gives: tag 1 admits a
+float, and leaving the choice open would give one instant two encodings. `accuracy_ms` gives the uncertainty of the
+reading, and is omitted when a producer has nothing useful to say about it.
 
 Which clock produced the reading is not a field here. The chip key beside this one names it, a bundle's
-[`source`](/specifications/universal-saves-format/#source-map) names the producer that read it, and a normalized instant
-is meant to be legible without either.
+[`source`](/specifications/bundle/#source-map) names the producer that read it, and a normalized instant is meant to be
+legible without either.
 
 ## A reading, not an anchor
 
@@ -67,19 +67,21 @@ its own.
 
 ## Where it goes
 
-The key attaches to the [header](/specifications/universal-saves-format/#0-header-map) or to a
-[part](/specifications/universal-saves-format/#part-map). On the header it names the clock of the medium the bundle was
-read from, and is the default for every part; on a part it names the clock behind that part's bytes, and a part without
-the key inherits the header's. [`source`](/specifications/universal-saves-format/#source-map) is scoped the same way,
-for the same reason: a bundle can hold one save read from a real cartridge and another exported by an emulator, and
-their clocks disagree.
+The [header](/specifications/bundle/#0-header-map) of a bundle whose `shape` is [`save`](/specifications/saves/), and
+nowhere else.
 
-The header is the ordinary answer, since one cartridge keeps one clock. A per-part reading is for the bundle whose parts
-came off different media. Repeating one reading across every part only creates copies that can drift apart.
+A clock belongs to the save that carries it, so the reading sits where the save's own header keeps it and stays correct
+once the save is sliced out of whatever held it. A nested bundle inherits nothing from the header around it, which is
+why a reading recorded outside the save would not survive the cut.
 
-The key MUST NOT sit on a [`bundle` part](/specifications/universal-saves-format/#nested-bundles). A nested bundle
-inherits nothing from the header around it, so its clock belongs in its own header, where it stays correct once the save
-is sliced out. [`binding`](/specifications/universal-saves-format/#bound-payloads) is placed by the same rule.
+The key **MUST NOT** sit on a [part](/specifications/bundle/#part-map), and **MUST NOT** sit on the header of a
+[card](/specifications/cards/) or a [collection](/specifications/collections/). One cartridge keeps one clock, and a
+bundle holding several saves whose clocks disagree is several save bundles, each carrying its own.
+
+A card is not an exception. What a memory card records about a save is when the card wrote it, which is
+[`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/) and a wall-clock time; this key is a game-world value, and
+the two are not the same reading. A device that keeps a clock of its own, as a VMU does, has those bytes preserved
+verbatim in [`system_area`](/specifications/bundle/#card-map).
 
 ## When to set it
 
@@ -88,5 +90,5 @@ Pokemon Gold, Silver and Crystal use; the GBA Pokemon titles and Animal Crossing
 at all, and omitting the key is the right answer for them.
 
 The reading is a game-world value and says nothing about when the bundle was assembled, which is
-[`created_at`](/specifications/universal-saves-format/#0-header-map)'s job. A player who sets a cartridge clock to 1999
-produces a bundle whose two dates disagree by decades, and both are correct.
+[`created_at`](/specifications/bundle/#0-header-map)'s job. A player who sets a cartridge clock to 1999 produces a
+bundle whose two dates disagree by decades, and both are correct.

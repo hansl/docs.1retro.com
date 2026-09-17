@@ -12,29 +12,31 @@ Non-normative. Each entry points at the text that defines the term, and that tex
 
 - **Bundle.** A complete `1SAV` document: the tag, the header and the array of parts. What a bundle _represents_ is
   whatever its header says, so the word alone does not say whether you hold one save, one card or a collection. It is
-  the format's self-contained unit and
-  [means the same thing sliced out](/specifications/universal-saves-format/#nested-bundles) as in place.
+  the format's self-contained unit and [means the same thing sliced out](/specifications/bundle/#nested-bundles) as in
+  place.
 - **Part.** One addressed slot inside a bundle, and not the atomic unit:
-  [`kind`, `role`, `path`](/specifications/universal-saves-format/#part-map) fall back to defaults and `source` and
-  `game` to the header, so a part lifted out of its bundle loses most of what it meant.
+  [`kind`, `role`, `path`](/specifications/bundle/#part-map) fall back to defaults and `source` and `game` to the
+  header, so a part lifted out of its bundle loses most of what it meant.
 - **Nested bundle.** A complete bundle carried as a part's payload. This is how a card holds its saves and a collection
-  holds its cards. See [Nested bundles](/specifications/universal-saves-format/#nested-bundles).
+  holds its cards. See [Nested bundles](/specifications/bundle/#nested-bundles).
 - **`bundle` part.** The part carrying a nested bundle, whose `sha256` is that bundle's content hash. Several extension
   keys turn on whether a part is this kind rather than an ordinary one.
-- **Save.** One game's state as a console wrote it. Inside a card, a save is a nested bundle rather than a part.
-- **Card.** A bundle whose header carries a [`card` map](/specifications/universal-saves-format/#card-map). `card` is
-  header-scoped, so one bundle is at most one card.
-- **Collection.** A bundle with no `system`, no `game` and no `card`, all of whose parts are `bundle` parts. It is how
-  one file spans systems. See [Shapes](/specifications/universal-saves-format/#shapes).
-- **Mixed bundle.** An ordinary bundle with its own `system` and `game` whose parts happen to include a `bundle` part:
-  one game whose state spans two media.
+- **Shape.** Which of `save`, `card` or `collection` a bundle is, carried in the header and never inferred. Each has a
+  document of its own, and the vocabulary is closed.
+- **Save.** One game's state as a console wrote it, and the [`save` shape](/specifications/saves/). Inside a card, a
+  save is a nested bundle rather than a part.
+- **Card.** The [`card` shape](/specifications/cards/): one memory card, its saves nested one per part. The
+  [`card` map](/specifications/bundle/#card-map) is required on it and forbidden elsewhere.
+- **Collection.** The [`collection` shape](/specifications/collections/): every part a `bundle` part, and no `system`,
+  `game` or `card` of its own. It is how one file spans systems.
+- **Mixed bundle.** A `save` whose parts include a `bundle` part: one game whose state spans two media.
 - **Depth.** How far a bundle sits inside another. A bundle's own parts are depth 0, a nested bundle's are depth 1, and
   one nested inside that is depth 2. A `bundle` part never sits at depth 2.
 
 ## Addressing a part
 
 - **Kind.** What a part's bytes play: absent for a save, or
-  [`bundle`, `card-image` or `aux`](/specifications/universal-saves-format/#part-kinds).
+  [`bundle`, `card-image` or `aux`](/specifications/bundle/#part-kinds).
 - **Role.** Which socket the bytes came out of, not what medium they are on. A controller pak is a card that lives in a
   controller. Names come from the [Save Roles registry](/registries/roles/).
 - **Path.** Where the bytes sat in the container they came from, as a relative path. On a card's `bundle` part it is the
@@ -43,10 +45,10 @@ Non-normative. Each entry points at the text that defines the term, and that tex
 - **`dirent`.** The container's directory entry for a part, carried verbatim as bytes. The format never says what a byte
   in one means: it is input for a writer, not a description of the save.
 - **Index copy.** A value repeated on an outer part so a consumer can list a container without stepping into payloads.
-  The inner header is authoritative and [wins on a mismatch](/specifications/universal-saves-format/#nested-bundles).
+  The inner header is authoritative and [wins on a mismatch](/specifications/bundle/#nested-bundles).
 
-`role`, `path` and `slot` together are [how a consumer names a part](/specifications/universal-saves-format/#part-map),
-and no two parts of one bundle may agree on all three.
+`role`, `path` and `slot` together are [how a consumer names a part](/specifications/bundle/#part-map), and no two parts
+of one bundle may agree on all three.
 
 ## Who does what
 
@@ -67,13 +69,13 @@ Most normative rules name one of these three, and which one is the whole meaning
   content-addressable store to resolve.
 - **Content hash.** The SHA-256 of a bundle's normalized encoding: uncompressed, every payload embedded. A pure function
   of what the bundle says, and a nested save's identity. See
-  [Content hash and file hash](/specifications/universal-saves-format/#content-hash-and-file-hash).
+  [Content hash and file hash](/specifications/bundle/#content-hash-and-file-hash).
 - **File hash.** The SHA-256 of the bytes on disk. It identifies one exact file, and equals the content hash only for a
   bundle that is self-contained and uncompressed.
 - **Normalized.** Of a nested bundle: uncompressed with every payload embedded, which is required so that its file hash
   and content hash are the same value.
 - **Bound payload.** A payload tied to the console that wrote it, which a consumer
-  [must not present as restorable](/specifications/universal-saves-format/#bound-payloads) anywhere else.
+  [must not present as restorable](/specifications/bundle/#bound-payloads) anywhere else.
 
 ## Cards
 
@@ -91,6 +93,6 @@ Most normative rules name one of these three, and which one is the whole meaning
   single producer, which these specifications define.
 - **Reserved name.** A [Vendor Names](/registries/vendors/) entry that belongs to nobody, which is what lets these
   specifications define keys under it and own their schemas.
-- **Minting a name.** Coining a new value in an open vocabulary, done
-  [sparingly](/specifications/universal-saves-format/#minting-a-name) and only where the name changes how a consumer has
-  to handle the data.
+- **Minting a name.** Coining a [reverse-DNS name](/specifications/common-types/reverse-dns-name/) for a field that is
+  the producer's own to name, such as a part's `kind` or a source's `app`. A field holding a
+  [slug](/specifications/common-types/slug/) is not minted into: its list grows by a PR against the spec or a registry.

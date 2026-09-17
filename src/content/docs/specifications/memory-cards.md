@@ -5,14 +5,14 @@ description:
   of real cards.
 ---
 
-How a card is represented is in the [Universal Saves Format](/specifications/universal-saves-format/#nested-bundles):
-the card is a bundle, its `card` map holds the card's own properties, and each save is a `bundle` part carrying that
-save's directory entry. This page is the other half, the part that is specific to real hardware. What a writer has to
-regenerate. What each format fixes. What splitting costs, worked through on actual cards.
+How a card is represented is in [Cards](/specifications/cards/): the card is a bundle of `shape` `"card"`, its `card`
+map holds the card's own properties, and each save is a `bundle` part carrying that save's directory entry. This page is
+the other half, the part that is specific to real hardware. What a writer has to regenerate. What each format fixes.
+What splitting costs, worked through on actual cards.
 
 That representation is enough to write the saves back onto a card of the same kind. It is not enough to reproduce the
 original card byte for byte, and it is not meant to be. A producer that wants byte-exact fidelity keeps a
-[`card-image`](/specifications/universal-saves-format/#part-kinds) part alongside the split saves.
+[`card-image`](/specifications/bundle/#part-kinds) part alongside the split saves.
 
 ## Per-format facts
 
@@ -30,8 +30,7 @@ original card byte for byte, and it is not meant to be. A producer that wants by
 
 The names are the ones already in circulation for these layouts, not system slugs with a suffix, which is why `ps1-mc`
 says `ps1` where the [registry](/registries/systems/) says `psx`, and why `vmu` carries no system at all. Reading a
-system out of one of these names is a mistake; that is what
-[`system`](/specifications/universal-saves-format/#0-header-map) is for.
+system out of one of these names is a mistake; that is what [`system`](/specifications/bundle/#0-header-map) is for.
 
 The table covers the formats this spec has rebuild rules for, not every backup medium ever built. PC Engine internal
 backup RAM, a Famicom Disk System disk, a WonderSwan's internal EEPROM and several others have no entry yet, and adding
@@ -39,9 +38,9 @@ one means documenting its `dirent` length and its rebuild rules alongside the na
 
 ## Capacity and out-of-band bytes
 
-[`capacity`](/specifications/universal-saves-format/#card-map) is the size of the card's data area: every byte the
-console can address on it, the blocks the filesystem keeps for itself included. It is the figure the card is sold under,
-and it does not move when the card fills up.
+[`capacity`](/specifications/bundle/#card-map) is the size of the card's data area: every byte the console can address
+on it, the blocks the filesystem keeps for itself included. It is the figure the card is sold under, and it does not
+move when the card fills up.
 
 It is not the room a save has. Every format here spends part of its data area on a header, a directory and a FAT, and
 some spend a great deal more: a VMU addresses 256 blocks and hands saves 200 of them, and a GameCube Memory Card 59 has
@@ -53,9 +52,9 @@ and nothing else does.
 It is not necessarily the length of a dump either, because some media carry an out-of-band area that is invisible to the
 filesystem. PS2 is the case that bites. An 8 MB PS2 card holds 8388608 bytes of data, and a raw dump from a hardware
 reader is 8650752 bytes, because every 512-byte page carries 16 further bytes of spare area holding ECC. So `capacity`
-on a PS2 card is 8388608, and a byte-exact [`card-image`](/specifications/universal-saves-format/#part-kinds) part of
-the same card is 8650752 bytes, and the two are _supposed_ to disagree. Read the image's length off its own `size`;
-never derive it from `capacity`.
+on a PS2 card is 8388608, and a byte-exact [`card-image`](/specifications/bundle/#part-kinds) part of the same card is
+8650752 bytes, and the two are _supposed_ to disagree. Read the image's length off its own `size`; never derive it from
+`capacity`.
 
 The split follows what a writer does. ECC is regenerated on write, like every other structural field below, so a save's
 payload never carries it and `capacity` never counts it. A `card-image` keeps it, because keeping the card byte for byte
@@ -102,10 +101,10 @@ than following a chain.
 
 ## What splitting a card drops
 
-[`system_area`](/specifications/universal-saves-format/#card-map) is what a writer needs to rebuild a card's own
-identity rather than only its contents: an N64 controller pak's 32-byte label, a Neo Geo card's 16-byte cardholder
-username, a Dreamcast VMU's custom colour and icon shape. None of it belongs to any save, so splitting a card would
-otherwise drop it, and keeping it would otherwise mean keeping a whole `card-image` for a few dozen bytes.
+[`system_area`](/specifications/bundle/#card-map) is what a writer needs to rebuild a card's own identity rather than
+only its contents: an N64 controller pak's 32-byte label, a Neo Geo card's 16-byte cardholder username, a Dreamcast
+VMU's custom colour and icon shape. None of it belongs to any save, so splitting a card would otherwise drop it, and
+keeping it would otherwise mean keeping a whole `card-image` for a few dozen bytes.
 
 What `system_area` does not cover is the residue of deleted saves, whose payload blocks a card keeps intact long after
 the directory stops pointing at them, and the contents of free blocks. Neither belongs to any save, so neither survives
@@ -130,8 +129,8 @@ Two details of that naming are worth having, because they are what `path` and `s
 ## Saves made of several files
 
 A PS2 save is a directory: `BASLUS-20312/` holding `icon.sys`, an icon file and the game's own data. Those are the parts
-of that save's nested bundle, distinguished by [`path`](/specifications/universal-saves-format/#part-map) exactly as
-`path` already covers 3DS extdata.
+of that save's nested bundle, distinguished by [`path`](/specifications/bundle/#part-map) exactly as `path` already
+covers 3DS extdata.
 
 The directory has a directory entry of its own, carrying its mode bits and timestamps, and it belongs to no file. That
 one rides on the outer `bundle` part, alongside the slot. `.psu` is laid out the same way, with the directory's entry
@@ -193,15 +192,14 @@ Fifteen Final Fantasy VII saves fill a PS1 card, and the shape above still holds
 knowing before you build one.
 
 The `game` map appears sixteen times: once in each nested bundle, and once per outer part as the index copy. The inner
-copies are not removable. [Nothing is inherited](/specifications/universal-saves-format/#nested-bundles) across the
-nesting boundary, which is exactly what lets a save be sliced out of the card as a byte copy and still say what game it
-belongs to. The outer copies are removable, since a part with no `game` falls back to the header's, and dropping all
-fifteen of them recovers 495 bytes out of 128505. That is 0.4%, in exchange for giving up listing the card without
-reading a payload.
+copies are not removable. [Nothing is inherited](/specifications/bundle/#nested-bundles) across the nesting boundary,
+which is exactly what lets a save be sliced out of the card as a byte copy and still say what game it belongs to. The
+outer copies are removable, since a part with no `game` falls back to the header's, and dropping all fifteen of them
+recovers 495 bytes out of 128505. That is 0.4%, in exchange for giving up listing the card without reading a payload.
 
 Such a card may name Final Fantasy VII in its own header, because for once a single game does describe the whole card.
 That is the exception to the rule that a card has no header `game`, and it is what makes the card answer "yes" to
-[the identified test](/specifications/universal-saves-format/#0-header-map).
+[the identified test](/specifications/bundle/#0-header-map).
 
 The other thing the full card shows is what splitting is worth. Fifteen saves come to 128505 bytes against the 131072 of
 a raw card image, so splitting a card that is genuinely full saves nothing. What it buys is that each save is separately
@@ -244,4 +242,4 @@ The directory's own entry is on the outer part, which is what a writer needs to 
 mode bits and timestamps. Each file's entry is on its own inner part. The outer payload is the three inner payloads plus
 the inner bundle's framing, most of which is the three 512-byte dirents. A card holding several PS2 saves repeats this
 arrangement once per save, and nothing has to infer where one save ends and the next begins. The nesting is
-[required](/specifications/universal-saves-format/#nested-bundles) rather than a shape this page happens to choose.
+[required](/specifications/bundle/#nested-bundles) rather than a shape this page happens to choose.

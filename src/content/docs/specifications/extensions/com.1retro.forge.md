@@ -33,10 +33,9 @@ and one that does not round-trips the whole thing and reads none of it.
 
 ## Key 0 is not a format slug
 
-The saves format checks several vocabularies against a strict
-[slug grammar](/specifications/universal-saves-format/#minting-a-name): lowercase ASCII, single dashes, at most 64
-bytes. This is not one of them. What a parser is called is Forge's business, so the value is free-form text — compare it
-by equality, and do not parse it for structure that may not be there.
+The saves format checks several vocabularies against a strict [slug grammar](/specifications/common-types/slug/):
+lowercase ASCII, single dashes, at most 64 bytes. This is not one of them. What a parser is called is Forge's business,
+so the value is free-form text — compare it by equality, and do not parse it for structure that may not be there.
 
 ## Status
 

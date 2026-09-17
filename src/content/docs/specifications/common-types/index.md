@@ -19,6 +19,7 @@ page applies to that field.
 | ------------------------------------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------- |
 | [Reverse-DNS name](/specifications/common-types/reverse-dns-name/) | text string        | Extension keys, catalog resolver names, the identity of a producing app. Anything unique that nobody hands out. |
 | [Hash value](/specifications/common-types/hash-value/)             | tagged byte string | Identifying a ROM or a file by its content rather than by its name.                                             |
+| [Slug](/specifications/common-types/slug/)                         | text string        | A short name from a list the spec or a registry keeps: a system, a card format, a socket, a kind of device.     |
 
 A type lands here once a second specification needs it. Until then it belongs to the spec that uses it, written out in
 place.

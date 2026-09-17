@@ -100,7 +100,10 @@ describe("extension schemas", { skip }, () => {
     before(() => (h = harness(BUNDLE_SCHEMA)));
     after(() => h.cleanup());
 
-    const header = new Map([[1, "gba"]]);
+    const header = new Map([
+      [0, "save"],
+      [1, "gba"],
+    ]);
     for (const [key, { valid }] of Object.entries(extensions)) {
       header.set(key, Object.values(valid)[0]);
     }
@@ -112,7 +115,9 @@ describe("extension schemas", { skip }, () => {
 
     it("accepts a part carrying them too, since both maps take the same keys", () => {
       const extras = new Map(Object.entries(extensions).map(([k, { valid }]) => [k, Object.values(valid)[0]]));
-      const run = h.validate(h.writeItem("part-extensions", bundle(map({ 1: "gba" }), [part({ extra: extras })])));
+      const run = h.validate(
+        h.writeItem("part-extensions", bundle(map({ 0: "save", 1: "gba" }), [part({ extra: extras })])),
+      );
       assert.equal(run.status, 0, `expected valid, got: ${run.stdout}${run.stderr}`);
     });
   });

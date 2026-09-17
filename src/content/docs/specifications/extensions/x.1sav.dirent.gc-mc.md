@@ -19,12 +19,12 @@ not rebuild an entry. The name sits under that key rather than beside it, the wa
 ```
 
 `game_code` and `maker_code` are the ASCII identifiers at 0x00 and 0x04.
-[`game`](/specifications/universal-saves-format/#game-hints-map)'s `serial` usually holds them joined, but that is a
-hint a producer may normalize or omit.
+[`game`](/specifications/bundle/#game-hints-map)'s `serial` usually holds them joined, but that is a hint a producer may
+normalize or omit.
 
 `filename` is the raw name at 0x08 without its padding, carried as bytes rather than text: a Japanese save names itself
-in Shift-JIS and [`path`](/specifications/universal-saves-format/#part-map) is UTF-8 by construction, so transcoding in
-and back out need not land on the same 32 bytes.
+in Shift-JIS and [`path`](/specifications/bundle/#part-map) is UTF-8 by construction, so transcoding in and back out
+need not land on the same 32 bytes.
 
 `banner_flags`, `icon_format` and `anim_speed` at 0x07, 0x30 and 0x32 stay packed as the hardware packs them, two bits
 per icon and two bits per frame. The decoded picture is [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/).
@@ -46,7 +46,7 @@ Four fields of the 64 are not carried here.
 | padding       | 0x06, 0x3a | Constant `0xff` and `0xffff`.                                                                        |
 
 Re-serializing this key therefore reproduces the entry except for the fields a writer owns. A consumer that wants the
-original 64 bytes reads the part's [`dirent`](/specifications/universal-saves-format/#part-map).
+original 64 bytes reads the part's [`dirent`](/specifications/bundle/#part-map).
 
 ## When to set it
 

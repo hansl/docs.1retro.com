@@ -4,11 +4,11 @@ description: The socket a save came out of, for every system that has more than 
 ---
 
 A role names **which socket** a save came out of, not what medium it is on: a controller pak is a card that lives in a
-controller, and its role says which controller. The
-[Universal Saves Format](/specifications/universal-saves-format/#part-map) carries it in a part's `role` field.
+controller, and its role says which controller. The [Universal Saves Format](/specifications/bundle/#part-map) carries
+it in a part's `role` field.
 
-A role follows the [slug grammar](/specifications/universal-saves-format/#minting-a-name) every vocabulary in these
-specifications shares: lowercase ASCII, single hyphens between runs, at most 64 bytes.
+A role follows the [slug grammar](/specifications/common-types/slug/) every vocabulary in these specifications shares:
+lowercase ASCII, single hyphens between runs, at most 64 bytes.
 
 A consumer uses `role` to name a part to a user and to match it against a socket when restoring. That second job is why
 a producer takes a name from this registry rather than inventing one: a private name is one nothing else can match, and

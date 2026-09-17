@@ -4,13 +4,13 @@ description: The canonical slug for every known gaming system.
 ---
 
 A system slug is the canonical short name of a gaming system. The
-[Universal Saves Format](/specifications/universal-saves-format/#0-header-map) carries it in the `system` header field,
-and other specs use the same names wherever a system is identified.
+[Universal Saves Format](/specifications/bundle/#0-header-map) carries it in the `system` header field, and other specs
+use the same names wherever a system is identified.
 
-A slug follows the [slug grammar](/specifications/universal-saves-format/#minting-a-name) every vocabulary in these
-specifications shares: lowercase ASCII, single hyphens between runs, at most 64 bytes. Each system has exactly one slug.
-The **Also seen as** column records names other tools use for the same system (directory names, core names, database
-labels); they help a producer map its input to the right slug, and are never emitted.
+A slug follows the [slug grammar](/specifications/common-types/slug/) every vocabulary in these specifications shares:
+lowercase ASCII, single hyphens between runs, at most 64 bytes. Each system has exactly one slug. The **Also seen as**
+column records names other tools use for the same system (directory names, core names, database labels); they help a
+producer map its input to the right slug, and are never emitted.
 
 A slug names **one system, not a family**. Successive generations get their own slug even where their media are
 compatible, so `psx` and `ps2` are separate despite a PS2 reading PS1 cards. Emulators support a system rather than a

@@ -13,13 +13,12 @@ registry covers three kinds:
 - **`openfpga`** — Analogue Pocket openFPGA cores. The canonical name is the `Author.Platform` folder the core installs
   to on the SD card, so the slug carries its author.
 
-The slug is what a producer writes in the Universal Saves Format's
-[`source.app`](/specifications/universal-saves-format/#source-map) field when a save was produced by that core. A core
-listed here MUST use its slug rather than a reverse-DNS name, even if it holds a domain, so that one core has one
-spelling. A slug is derived mechanically from the kind's canonical name: lowercase, with every run of non-alphanumeric
-characters replaced by a single `-`, and any leading or trailing one dropped. The result conforms to the
-[slug grammar](/specifications/universal-saves-format/#minting-a-name) every vocabulary here shares. Where a core also
-exists as a standalone emulator (mGBA, DuckStation), the slug covers both; the engine is the same.
+The slug is what a producer writes in the Universal Saves Format's [`source.app`](/specifications/bundle/#source-map)
+field when a save was produced by that core. A core listed here MUST use its slug rather than a reverse-DNS name, even
+if it holds a domain, so that one core has one spelling. A slug is derived mechanically from the kind's canonical name:
+lowercase, with every run of non-alphanumeric characters replaced by a single `-`, and any leading or trailing one
+dropped. The result conforms to the [slug grammar](/specifications/common-types/slug/) every vocabulary here shares.
+Where a core also exists as a standalone emulator (mGBA, DuckStation), the slug covers both; the engine is the same.
 
 The **Systems** column uses slugs from the [System Slugs registry](/registries/systems/). The **Also seen as** column
 records other names for the same core: former names (the Mednafen cores were renamed Beetle, Genesis_MiSTer became

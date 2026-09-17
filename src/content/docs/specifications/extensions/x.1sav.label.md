@@ -25,8 +25,8 @@ VMU keeps a longer description for the boot ROM menu than the one it shows in it
 its name omits it.
 
 Neither field is a slot for whatever a format prints next. The name of the game or of the application that wrote the
-save is [`game`](/specifications/universal-saves-format/#game-hints-map), and a title a format breaks across two lines
-for layout is one title: a PS2 title carries a break offset into a single string, and both halves are `title`.
+save is [`game`](/specifications/bundle/#game-hints-map), and a title a format breaks across two lines for layout is one
+title: a PS2 title carries a break offset into a single string, and both halves are `title`.
 
 ## Where the text comes from
 
@@ -37,17 +37,17 @@ name.
 
 ## Where it goes
 
-The [header](/specifications/universal-saves-format/#0-header-map) of the bundle that is the save, because the text
-travels with the save when it is sliced out. [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/) sits on the
-part instead, being the card's record rather than the save's.
+The [header](/specifications/bundle/#0-header-map) of the bundle that is the save, because the text travels with the
+save when it is sliced out. [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/) sits on the part instead, being
+the card's record rather than the save's.
 
-A producer **MAY** repeat the key on the [`bundle` part](/specifications/universal-saves-format/#nested-bundles)
-carrying the save, as an index copy so a consumer can list a card without stepping into payloads. Producers **SHOULD**
-keep the two consistent, and on a mismatch the inner header wins.
+A producer **MAY** repeat the key on the [`bundle` part](/specifications/bundle/#nested-bundles) carrying the save, as
+an index copy so a consumer can list a card without stepping into payloads. Producers **SHOULD** keep the two
+consistent, and on a mismatch the inner header wins.
 
-A consumer holding both this key and a [`description`](/specifications/universal-saves-format/#0-header-map) **SHOULD**
-show `title`, and **MUST NOT** treat a `description` that disagrees as malformed. One is what the console called the
-save, the other a free-form note the bundle's author attached.
+A consumer holding both this key and a [`description`](/specifications/bundle/#0-header-map) **SHOULD** show `title`,
+and **MUST NOT** treat a `description` that disagrees as malformed. One is what the console called the save, the other a
+free-form note the bundle's author attached.
 
 ## What a producer may write
 
@@ -56,18 +56,18 @@ out of Shift-JIS, trimming padding a format pads with. A consumer re-deriving th
 slightly different string, and **MUST NOT** treat that as malformed.
 
 The key is a projection and does not rebuild an entry. A writer copying an entry takes the bytes from
-[`dirent`](/specifications/universal-saves-format/#part-map); a writer building one takes the fields from the format's
-own key, such as [`x.1sav.dirent.gc-mc`](/specifications/extensions/x.1sav.dirent.gc-mc/). A consumer **MUST NOT**
-prefer this key over either.
+[`dirent`](/specifications/bundle/#part-map); a writer building one takes the fields from the format's own key, such as
+[`x.1sav.dirent.gc-mc`](/specifications/extensions/x.1sav.dirent.gc-mc/). A consumer **MUST NOT** prefer this key over
+either.
 
 ## What does not go here
 
 - **When the card wrote the save down.** [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/).
 - **Icons and banners.** [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/).
-- **The name the card's directory holds.** [`path`](/specifications/universal-saves-format/#part-map), which a consumer
-  matches on. A title is for showing a person, and the two are not always the same string.
+- **The name the card's directory holds.** [`path`](/specifications/bundle/#part-map), which a consumer matches on. A
+  title is for showing a person, and the two are not always the same string.
 - **Which game the save belongs to,** including the application that wrote it.
-  [`game`](/specifications/universal-saves-format/#game-hints-map).
+  [`game`](/specifications/bundle/#game-hints-map).
 
 ## When to set it
 

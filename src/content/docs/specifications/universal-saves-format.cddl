@@ -1,6 +1,6 @@
 ; ============================================================================
 ; 1SAV - Universal Saves Format, v1
-; Spec version 0.1: not yet stabilized, expect breaking changes.
+; Spec version 0.2: not yet stabilized, expect breaking changes.
 ;
 ; CDDL per RFC 8610. This file is the shape of a bundle and nothing else.
 ; Why the shape is what it is:  /specifications/universal-saves-format/
@@ -19,29 +19,66 @@ bundle = [
 ]
 
 ; Integer keys belong to the spec; text keys belong to producers. This schema
-; describes v0.1 exactly, so an integer key it does not list fails validation.
-; A decoder is looser on purpose: it ignores and round-trips an integer key it
-; does not know, since that key is a later minor version's. See the spec.
+; describes v0.2 exactly, so an integer key it does not list fails validation,
+; and so does a `shape` it does not list. A decoder is looser on purpose: it
+; parses and round-trips both, since each is a later minor version's. See the
+; spec.
 
 ; ---- [0] Header ------------------------------------------------------------
+; `shape` says which document governs the bundle, and the three arms below are
+; what each one allows. They are disjoint on key 0, so a decoder reads the shape
+; and knows the rest without trying the arms in turn, and key 0 encodes first
+; under canonical ordering, so the shape leads the bundle. The vocabulary is
+; spec-owned and closed: a shape needs a document and rules of its own, so a
+; producer may not mint one, and a consumer MAY refuse one it does not know.
+;
 ; `* reverse-dns => any` admits a producer's own keys. What sits under one is
 ; entirely that producer's: any CBOR value, of any shape, never inspected here.
-header = {
-  ? 0 => epoch-time,  ; created_at
+header = save-header / card-header / collection-header
+
+; One game's state, as the medium stored it.
+save-header = {
+    0 => "save",
   ? 1 => system-slug, ; system      (gb | snes | n64 | 3ds | ...)
   ? 2 => game,        ; game        (identification hints)
-  ? 3 => source,      ; source      (bundle producer; default for all parts)
-  ? 4 => card,        ; card        (present when the bundle is a memory card)
-  ? 5 => tstr,        ; description (free-form human note)
-  * reverse-dns => any,   ; extension keys, e.g. "x.1sav.rtc"
+  common-header,
 }
 
+; One memory card. The `card` map is what makes it one, so it is required here
+; and admitted nowhere else.
+card-header = {
+    0 => "card",
+    4 => card,        ; card        (format, capacity, system area)
+  ? 1 => system-slug,
+  ? 2 => game,        ; a card whose saves are all one game may name it
+  common-header,
+}
+
+; Cards and saves in one file. A collection has nothing of its own to say, so
+; `system`, `game` and `card` are all absent.
+collection-header = {
+    0 => "collection",
+  common-header,
+}
+
+common-header = (
+  ? 3 => source,      ; source      (bundle producer; default for all parts)
+  ? 5 => tstr,        ; description (free-form human note)
+  ? 6 => epoch-time,  ; created_at
+  * reverse-dns => any,   ; extension keys, e.g. "x.1sav.rtc"
+)
+
+
+; `system` here is the game's, not the medium's: which system's release these
+; hints identify. The header's `system` says what will load the bytes, and the
+; two answer different questions even where they agree.
 game = {
   ? 0 => game-ids,    ; game_id
   ? 1 => rom-hashes,  ; rom_hashes
   ? 2 => tstr,        ; rom_filename
   ? 3 => tstr,        ; serial
-  ? 4 => tstr,        ; name
+  ? 4 => tstr,        ; title
+  ? 5 => system-slug, ; system
 }
 
 ; reverse-DNS resolver name ("com.1retro", "org.hasheous", ...) => this game's
@@ -95,7 +132,7 @@ part = {
 ; Keys 7 to 9 describe how to read the payload, and a streaming decoder meets
 ; them in the order it uses them: whether to inflate, how much that yields, and
 ; what the result must hash to. `size` is carried only where it cannot be
-; derived, which leaves a part in one of three shapes.
+; derived, which leaves a part in one of three forms.
 ;
 ; Arm order matters here and is not cosmetic: the tool takes the first that
 ; matches without backtracking, so the most constrained shape comes first. With

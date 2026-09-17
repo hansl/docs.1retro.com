@@ -4,8 +4,8 @@ description: The latched state of the Seiko S-3511A clock in a GBA cartridge, fo
 slug: specifications/extensions/x.1sav.rtc.s3511a
 ---
 
-**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** the bundle header and a
-part, never a `bundle` part · **Status:** normative schema, optional to carry
+**Owner:** these specifications, under a [reserved name](/registries/vendors/) · **Applies to:** a save's bundle header
+· **Status:** normative schema, optional to carry
 
 The GBA's clock is a Seiko S-3511A on the cartridge. [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/) carries the
 instant a consumer needs to display it; this key carries what the chip itself holds, which is what a producer handing
@@ -41,11 +41,9 @@ key under a [name of its own](/specifications/common-types/reverse-dns-name/).
 
 ## Where it goes
 
-Wherever [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/#where-it-goes) goes, and under the same prohibition: the
-[header](/specifications/universal-saves-format/#0-header-map) or a
-[part](/specifications/universal-saves-format/#part-map), never a
-[`bundle` part](/specifications/universal-saves-format/#nested-bundles). A producer carrying this key and `x.1sav.rtc`
-puts both in the same place, since they describe one clock.
+Wherever [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/#where-it-goes) goes and nowhere else: the
+[header](/specifications/bundle/#0-header-map) of a bundle whose `shape` is [`save`](/specifications/saves/). A producer
+carrying this key and `x.1sav.rtc` puts both in the same place, since they describe one clock.
 
 ## When to set it
 
@@ -54,7 +52,7 @@ Boy cartridge keeps a different clock and takes [`x.1sav.rtc.mbc3`](/specificati
 
 This key's placement follows [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/)'s
 [scope rules](/specifications/extensions/x.1sav.rtc/#where-it-goes), including the prohibition on a
-[`bundle` part](/specifications/universal-saves-format/#nested-bundles). A producer **SHOULD** carry
+[`bundle` part](/specifications/bundle/#nested-bundles). A producer **SHOULD** carry
 [`x.1sav.rtc`](/specifications/extensions/x.1sav.rtc/) on the same map: a consumer that only wants to know what time the
 game thinks it is should not have to decode BCD to find out, and the two
 [may disagree](/specifications/extensions/x.1sav.rtc/#disagreeing-with-the-chip-is-not-an-error) without either being
