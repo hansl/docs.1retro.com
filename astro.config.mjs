@@ -67,6 +67,7 @@ export default defineConfig({
                 { slug: "specifications/bundle" },
                 { slug: "specifications/saves" },
                 { slug: "specifications/cards" },
+                { slug: "specifications/device" },
                 { slug: "specifications/collections" },
                 { slug: "specifications/memory-cards" },
                 { label: "Extensions", items: [{ autogenerate: { directory: "specifications/extensions" } }] },

@@ -25,7 +25,7 @@ bundle = [
 ; spec.
 
 ; ---- [0] Header ------------------------------------------------------------
-; `shape` says which document governs the bundle, and the three arms below are
+; `shape` says which document governs the bundle, and the four arms below are
 ; what each one allows. They are disjoint on key 0, so a decoder reads the shape
 ; and knows the rest without trying the arms in turn, and key 0 encodes first
 ; under canonical ordering, so the shape leads the bundle. The vocabulary is
@@ -34,7 +34,7 @@ bundle = [
 ;
 ; `* reverse-dns => any` admits a producer's own keys. What sits under one is
 ; entirely that producer's: any CBOR value, of any shape, never inspected here.
-header = save-header / card-header / collection-header
+header = save-header / card-header / device-header / collection-header
 
 ; One game's state, as the medium stored it.
 save-header = {
@@ -51,6 +51,15 @@ card-header = {
     4 => card,        ; card        (format, capacity, system area)
   ? 1 => system-slug,
   ? 2 => game,        ; a card whose saves are all one game may name it
+  common-header,
+}
+
+; One console's storage, read whole: its components are the parts, each a card
+; or a save. `system` is required, which is what tells a device from a
+; collection; `game` is absent, since the components hold saves for many.
+device-header = {
+    0 => "device",
+    1 => system-slug,   ; system
   common-header,
 }
 

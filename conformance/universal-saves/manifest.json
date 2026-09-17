@@ -3,8 +3,8 @@
   "spec_version": "0.2",
   "generated_from": "test/bundles.js",
   "counts": {
-    "valid": 27,
-    "invalid": 59
+    "valid": 28,
+    "invalid": 62
   },
   "cases": [
     {
@@ -55,6 +55,13 @@
       "file": "valid/thin-card.cbor",
       "sha256": "1647de367a7a82773f881f1dccccb6539b674a9b64e4da1cb49a84ba07def2d7",
       "note": "A thin card: the entry points at its save's content hash instead of embedding it, so the file is a list of slots, dirents and hashes."
+    },
+    {
+      "name": "device",
+      "expect": "valid",
+      "file": "valid/device.cbor",
+      "sha256": "c578027b7faefee949ad1cf3c9fc64c5f5e0a2b575bca549d8fdce37717f0859",
+      "note": "One console's storage read whole. A Sega CD carries internal backup RAM and a Backup RAM Cart at once; neither is one game's state, and the pair is not a collection, because both came off one system."
     },
     {
       "name": "collection",
@@ -275,6 +282,30 @@
       "file": "invalid/collection-with-card-map.cbor",
       "sha256": "6b8a7224f6157487db477e2b09be01699e058907c70ad68c1884747ba927a863",
       "note": "Each shape admits a different header. A card is a card because it carries the `card` map, a save never carries one, and a collection has nothing of its own to say."
+    },
+    {
+      "name": "device-without-system",
+      "expect": "invalid",
+      "rejected_by": "schema",
+      "file": "invalid/device-without-system.cbor",
+      "sha256": "22f2e02e93e1a99cd9091d664e2fa6e2bf27e185d85a70c2f968bb4d657a4108",
+      "note": "`system` is what tells a device from a collection, so it is required, and the components hold saves for many games rather than for one."
+    },
+    {
+      "name": "device-with-game",
+      "expect": "invalid",
+      "rejected_by": "schema",
+      "file": "invalid/device-with-game.cbor",
+      "sha256": "60a8bc055833afb9756369daa363bb389d3462c5a61c0df174ea7b5d69dc25db",
+      "note": "`system` is what tells a device from a collection, so it is required, and the components hold saves for many games rather than for one."
+    },
+    {
+      "name": "device-with-card-map",
+      "expect": "invalid",
+      "rejected_by": "schema",
+      "file": "invalid/device-with-card-map.cbor",
+      "sha256": "ed4df9e3f6a0813dfa8902f7b87c12fd27f3c3dd70dab139f90598708f6ff177",
+      "note": "`system` is what tells a device from a collection, so it is required, and the components hold saves for many games rather than for one."
     },
     {
       "name": "card-without-capacity",

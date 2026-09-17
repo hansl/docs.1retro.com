@@ -120,14 +120,15 @@ never seen. Each field in [Bundle](/specifications/bundle/) says which kind it h
 
 ## Shapes
 
-[`shape`](/specifications/bundle/#0-header-map) names one of three, and each has a document that defines what its parts
+[`shape`](/specifications/bundle/#0-header-map) names one of four, and each has a document that defines what its parts
 mean:
 
-| Shape                                        | The bundle is                       | Its parts are                                  |
-| -------------------------------------------- | ----------------------------------- | ---------------------------------------------- |
-| [`save`](/specifications/saves/)             | one game's state                    | the regions or files that state is made of     |
-| [`card`](/specifications/cards/)             | one memory card                     | one `bundle` part per save, and the card's own |
-| [`collection`](/specifications/collections/) | several cards and saves in one file | one `bundle` part per card or save             |
+| Shape                                        | The bundle is                       | Its parts are                                       |
+| -------------------------------------------- | ----------------------------------- | --------------------------------------------------- |
+| [`save`](/specifications/saves/)             | one game's state                    | the regions or files that state is made of          |
+| [`card`](/specifications/cards/)             | one memory card                     | one `bundle` part per save, and the card's own      |
+| [`device`](/specifications/device/)          | one console's storage, read whole   | one `bundle` part per component, each with a `role` |
+| [`collection`](/specifications/collections/) | several cards and saves in one file | one `bundle` part per card or save                  |
 
 A decoder reads `shape` rather than inferring it from what the header happens to carry. The vocabulary is spec-owned,
 and a later minor version assigns a new one with a document to go with it.
@@ -138,8 +139,8 @@ it does for an integer key a later version assigned. It **MUST NOT** guess what 
 any operation that depends on knowing: walking the parts, restoring a save, rebuilding a card. Refusing to act on a
 bundle is not the same as rejecting it, and only the second loses the bytes.
 
-The schema is the narrower of the two on purpose. It pins the three shapes this version defines, so validating against
-it says "this is a conforming 0.2 bundle" rather than "some decoder can read this", the same asymmetry
+The schema is the narrower of the two on purpose. It pins the four shapes this version defines, so validating against it
+says "this is a conforming 0.2 bundle" rather than "some decoder can read this", the same asymmetry
 [Additive integer keys](#additive-integer-keys) describes.
 
 A bundle names its shape and a decoder reads it; what the parts then mean is that shape's document, and

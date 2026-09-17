@@ -1,14 +1,13 @@
 ---
 title: Bundle
 description:
-  Every field a bundle carries, shared by all three shapes. The header, the parts, and how a payload is addressed and
-  hashed.
+  Every field a bundle carries, shared by every shape. The header, the parts, and how a payload is addressed and hashed.
 slug: specifications/bundle
 ---
 
 The field reference for the format. What a bundle is made of, what every key means, and how payloads are carried and
-hashed. It is the same for all three [shapes](/specifications/universal-saves-format/#shapes); what differs is which
-keys apply and what the parts stand for, which each shape's own document says.
+hashed. It is the same for every [shape](/specifications/universal-saves-format/#shapes); what differs is which keys
+apply and what the parts stand for, which each shape's own document says.
 
 Read [Universal Saves Format](/specifications/universal-saves-format/) first for how the format works. Most producers
 need that page and their shape's, and come here for a field they have to get exactly right.

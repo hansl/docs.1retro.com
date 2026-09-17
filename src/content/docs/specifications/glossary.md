@@ -21,12 +21,14 @@ Non-normative. Each entry points at the text that defines the term, and that tex
   holds its cards. See [Nested bundles](/specifications/bundle/#nested-bundles).
 - **`bundle` part.** The part carrying a nested bundle, whose `sha256` is that bundle's content hash. Several extension
   keys turn on whether a part is this kind rather than an ordinary one.
-- **Shape.** Which of `save`, `card` or `collection` a bundle is, carried in the header and never inferred. Each has a
-  document of its own, and the vocabulary is closed.
+- **Shape.** Which of `save`, `card`, `device` or `collection` a bundle is, carried in the header and never inferred.
+  Each has a document of its own, and the vocabulary is closed.
 - **Save.** One game's state as a console wrote it, and the [`save` shape](/specifications/saves/). Inside a card, a
   save is a nested bundle rather than a part.
 - **Card.** The [`card` shape](/specifications/cards/): one memory card, its saves nested one per part. The
   [`card` map](/specifications/bundle/#card-map) is required on it and forbidden elsewhere.
+- **Device.** The [`device` shape](/specifications/device/): one console's storage read whole, its components nested one
+  per part and told apart by `role`. `system` is required, which is what separates it from a collection.
 - **Collection.** The [`collection` shape](/specifications/collections/): every part a `bundle` part, and no `system`,
   `game` or `card` of its own. It is how one file spans systems.
 - **Mixed bundle.** A `save` whose parts include a `bundle` part: one game whose state spans two media.

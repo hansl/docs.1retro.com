@@ -219,6 +219,20 @@ export const valid = {
     })(),
   ]),
 
+  // One console's storage read whole. A Sega CD carries internal backup RAM and
+  // a Backup RAM Cart at once; neither is one game's state, and the pair is not
+  // a collection, because both came off one system.
+  device: bundle(map({ 0: "device", 1: "segacd" }), [
+    nested(bundle(map({ 0: "save", 1: "segacd" }), [part({ payload: pattern(8192, 11) })]), {
+      id: 0,
+      role: "internal",
+    }),
+    nested(bundle(map({ 0: "save", 1: "segacd" }), [part({ payload: pattern(32768, 13) })]), {
+      id: 1,
+      role: "cartridge",
+    }),
+  ]),
+
   // A collection: no system, no game, no card of its own, and entries that do
   // not agree on a system. This is how one file spans systems, and it is the
   // deepest shape the spec allows, since the PS1 entry is itself a card.
@@ -530,6 +544,12 @@ export const invalid = {
   "collection-with-system": bundle(map({ 0: "collection", 1: "psx" }), [part()]),
   "collection-with-game": bundle(map({ 0: "collection", 2: FF7 }), [part()]),
   "collection-with-card-map": bundle(map({ 0: "collection", 4: map({ 0: "ps1-mc", 1: 131072 }) }), [part()]),
+
+  // `system` is what tells a device from a collection, so it is required, and
+  // the components hold saves for many games rather than for one.
+  "device-without-system": bundle(map({ 0: "device" }), [part()]),
+  "device-with-game": bundle(map({ 0: "device", 1: "segacd", 2: FF7 }), [part()]),
+  "device-with-card-map": bundle(map({ 0: "device", 1: "segacd", 4: map({ 0: "ps1-mc", 1: 131072 }) }), [part()]),
 
   // `card` needs both format and capacity; neither is optional.
   "card-without-capacity": bundle(map({ 0: "card", 1: "psx", 4: map({ 0: "ps1-mc" }) }), [part()]),
