@@ -80,6 +80,13 @@ Block _counts_ are a different thing, and they are still not stored, because the
 exactly the bytes the card allocated, so the count is the nested bundle's total payload size divided by the
 [block size](#per-format-facts) for the format.
 
+That division takes the block size from the format, which holds for every format here except `saturn-bup`. Its 64 is the
+console's internal memory and a backup cartridge carries its own, so a count derived this way for a cartridge is wrong.
+The table stands as written for 0.2. Settling it means keying the block size on
+[`capacity`](/specifications/bundle/#card-map), which is required on every card map, rather than on the format alone: a
+cartridge dumped by itself is a card bundle with no [`role`](/registries/roles/) anywhere in it, so the medium cannot be
+read back off the role the way it can when a Saturn is read whole as a [device](/specifications/device/).
+
 ## What a writer regenerates
 
 Everything structural: block chains, the FAT or BAT and its mirrors, every checksum, the header block, directory
