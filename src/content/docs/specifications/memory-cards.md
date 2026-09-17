@@ -144,6 +144,7 @@ Three saves on a 128 KiB card, two of them for the same game. The Final Fantasy 
 ```text
 [0] header:
 {
+  0: "card",
   1: "psx",
   4: { 0: "ps1-mc", 1: 131072 },
 }
@@ -173,6 +174,7 @@ Inside the first payload:
 ```text
 [0] header:
 {
+  0: "save",
   1: "psx",
   2: { 3: "SCUS-94163", 4: "Final Fantasy VII" },
   5: "Midgar, before the reactor",
@@ -213,6 +215,7 @@ not the length of a dump of it; see [Capacity and out-of-band bytes](#capacity-a
 ```text
 [0] header:
 {
+  0: "card",
   1: "ps2",
   4: { 0: "ps2-mc", 1: 8388608 },
 }
@@ -228,6 +231,7 @@ and inside that payload, the save itself:
 ```text
 [0] header:
 {
+  0: "save",
   1: "ps2",
   2: { 3: "SLUS-20312", 4: "Final Fantasy X" },
 }
@@ -243,3 +247,61 @@ mode bits and timestamps. Each file's entry is on its own inner part. The outer 
 the inner bundle's framing, most of which is the three 512-byte dirents. A card holding several PS2 saves repeats this
 arrangement once per save, and nothing has to infer where one save ends and the next begins. The nesting is
 [required](/specifications/bundle/#nested-bundles) rather than an arrangement this page happens to choose.
+
+## Worked example: an N64 cartridge and its Controller Pak
+
+Mario Kart 64 keeps progress in the cartridge's battery SRAM and its ghosts in a Controller Pak. Dumping both gives two
+storage components rather than one game's bytes, so the bundle is a [device](/specifications/device/): the pak holds
+notes for games the cartridge knows nothing about, and neither component is inside the other.
+
+```text
+[0] header:
+{
+  0: "device",
+  1: "n64",
+}
+
+[1] parts:
+  { 0: 0, 1: "bundle", 2: "cartridge", 9: 18540(h'…'),
+    11: { 3: "NUS-NKTE", 4: "Mario Kart 64" }, 12: "n64", -1: h'DA31534156…' }
+
+  { 0: 1, 1: "bundle", 2: "controller-pak-1", 9: 18540(h'…'), 12: "n64", -1: h'DA31534156…' }
+```
+
+The cartridge's payload is a plain save, one part and nothing else:
+
+```text
+[0] header:
+{
+  0: "save",
+  1: "n64",
+  2: { 3: "NUS-NKTE", 4: "Mario Kart 64" },
+}
+
+[1] parts:
+  { 0: 0, 9: 18540(h'…'), -1: h'…512 bytes of SRAM…' }
+```
+
+The pak's is a card, one nested save per note, laid out like any other card:
+
+```text
+[0] header:
+{
+  0: "card",
+  1: "n64",
+  4: { 0: "n64-cpak", 1: 32768, 2: h'…32 bytes…' },
+}
+
+[1] parts:
+  { 0: 0, 1: "bundle", 2: "controller-pak-1", 4: 1, 5: h'…32 bytes…', 9: 18540(h'…'),
+    11: { 3: "NUS-NKTE", 4: "Mario Kart 64" }, 12: "n64", -1: h'DA31534156…' }
+```
+
+The device header carries no `game`, because the pak's other notes are not Mario Kart 64's, and the outer parts carry
+`game` and `system` only as an [index](/specifications/bundle/#nested-bundles) of what each component holds.
+
+Carry only that game's note instead of the whole pak and there is no device at all: the cartridge save and the note are
+two ordinary parts of one [save](/specifications/saves/), told apart by `role`, with nothing nested. Which of the two a
+producer writes depends on what it read, not on what the game is.
+
+This arrangement is the `cartridge-and-pak` case in the conformance corpus.
