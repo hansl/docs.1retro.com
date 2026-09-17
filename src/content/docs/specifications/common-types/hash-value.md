@@ -35,21 +35,11 @@ digest to be trusted, they name SHA-256 directly and do not offer a choice.
 
 ## Where the tags come from
 
-Tags 18540 and 18542 are not ours. IANA registers a block of bare-hash tags at 18300-18811, where the tag for COSE
-algorithm _N_ is `18556 + N`
-([draft-bormann-cbor-notable-tags, section 3.1.1](https://datatracker.ietf.org/doc/draft-bormann-cbor-notable-tags/)).
-SHA-256 is COSE algorithm -16 and SHA-1 is -14, which gives 18540 and 18542. A generic CBOR tool that knows that block
-decodes those two entries without knowing anything about these specifications.
+Tags 18540 and 18542 are not ours. They fall in the bare-hash block IANA already assigns, so a generic CBOR tool decodes
+those two without knowing anything about these specifications. 46010 and 46011 are taken from the
+First-Come-First-Served range instead, because COSE registers no CRC-32 and no MD5 and never will.
 
-COSE registers no CRC-32 and no MD5, and it never will: the range of COSE algorithm numbers that block maps is assigned
-by Standards Action, which means an RFC. So 46010 and 46011 are taken by these specifications from the IANA
-First-Come-First-Served range, where a registration is a form and no review.
-
-Neither is registered there yet. Until the forms are filed, the two numbers are held by nothing but this page: a generic
-CBOR tool has no way to learn what they mean, and nothing stops another producer claiming them first.
-
-Mixing the two origins is deliberate. Minting private tags for SHA-1 and SHA-256 when standard ones exist would buy
-uniformity in this table at the cost of recognition by every tool that already reads the standard block.
+Neither is registered yet. [IANA Registrations](/iana/) holds the provenance of all four and the current status of each.
 
 ## Rules
 
@@ -66,5 +56,8 @@ uniformity in this table at the cost of recognition by every tool that already r
 ## Adding an algorithm
 
 Open a PR against this page. An algorithm that has a COSE number in -256..255 already has a bare-hash tag and takes it;
-anything else needs a new First-Come-First-Served registration, which is a form and no review. An algorithm already
-listed here never changes tag, even if it later gains a standard one.
+anything else needs a new First-Come-First-Served registration, which is a form and no review.
+
+That form is filed rather than merely planned. A number this specification uses and has not registered is held by
+nothing but this page, so every outstanding registration is submitted while the format is still in beta, and none is
+carried into 1.0 unfiled. An algorithm already listed here never changes tag, even if it later gains a standard one.

@@ -84,6 +84,12 @@ export default defineConfig({
           label: "Guides",
           items: [{ autogenerate: { directory: "guides" } }],
         },
+        {
+          // Last, and not part of the reading order: these pages exist to be
+          // cited by an IANA form, not to be browsed.
+          label: "IANA",
+          items: [{ autogenerate: { directory: "iana" } }],
+        },
       ],
     }),
   ],
