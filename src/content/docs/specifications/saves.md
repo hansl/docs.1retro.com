@@ -46,14 +46,12 @@ defines them all.
 
 ### Carrying the payload
 
-Three forms, and a producer picks one:
+Two forms, and a producer picks one:
 
 - **Embedded**, the ordinary case: `sha256` and the bytes. No `encoding`, no `size`, because an embedded uncompressed
   payload states its own length.
 - **Compressed**: `encoding`, `size` and `sha256`, then the compressed bytes. `sha256` and `size` both describe the
   payload _before_ compression, so neither changes when a producer recompresses.
-- **Thin**: `size` and `sha256`, and a reference instead of bytes, to be resolved from a content-addressable store. A
-  thin part **MUST NOT** set `encoding`, since the store is keyed by the hash of the uncompressed payload.
 
 ### Encoding
 

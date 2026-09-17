@@ -200,12 +200,9 @@ export function* everyPart(bundleValue, depth = 0) {
       yield { part: p, depth, kind };
       continue;
     }
-    // A thin entry references its bundle instead of carrying it, so there is
-    // nothing here to descend into.
-    const payload = p.get(PAYLOAD);
-    const inner = payload instanceof Uint8Array ? decode(payload) : undefined;
+    const inner = decode(p.get(PAYLOAD));
     yield { part: p, depth, kind, bundle: inner };
-    if (inner) yield* everyPart(inner, depth + 1);
+    yield* everyPart(inner, depth + 1);
   }
 }
 

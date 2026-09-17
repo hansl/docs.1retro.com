@@ -180,7 +180,6 @@ describe("fixtures", () => {
   it("hashes every uncompressed part payload with its own sha256", () => {
     for (const [name, fixture] of Object.entries(valid)) {
       for (const { part: p } of everyPart(fixture)) {
-        if (!(p.get(PAYLOAD) instanceof Uint8Array)) continue; // an external ref carries no bytes
         if (p.get(7) !== undefined) continue;
         assert.ok(sha256(p.get(PAYLOAD)).equals(p.get(SHA256).value), `${name}: part ${p.get(0)} sha256 matches`);
         assert.equal(p.get(8), undefined, `${name}: part ${p.get(0)} carries a derivable size`);

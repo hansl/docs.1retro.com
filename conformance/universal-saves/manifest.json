@@ -3,7 +3,7 @@
   "spec_version": "0.2",
   "generated_from": "test/bundles.js",
   "counts": {
-    "valid": 28,
+    "valid": 27,
     "invalid": 63
   },
   "cases": [
@@ -48,13 +48,6 @@
       "file": "valid/card-of-one-game.cbor",
       "sha256": "48f19401b0e701a2bec7bfdec4b696bb35fea758cde6c167b01296e74cab1ef6",
       "note": "A card holding nothing but saves for one game, which is what Final Fantasy VII does to a PS1 card: one block per save, fifteen slots, no room for anything else. The header names the game, because here a single game really does describe the whole card. The `-Sxx` in the name is the game's own slot and the card's directory slot is a different number, so the two entries below are deliberately not aligned."
-    },
-    {
-      "name": "thin-card",
-      "expect": "valid",
-      "file": "valid/thin-card.cbor",
-      "sha256": "1647de367a7a82773f881f1dccccb6539b674a9b64e4da1cb49a84ba07def2d7",
-      "note": "A thin card: the entry points at its save's content hash instead of embedding it, so the file is a list of slots, dirents and hashes."
     },
     {
       "name": "device",

@@ -257,9 +257,6 @@ No decoder can check this, which is why it sits outside the list above: three fi
 card are the same shape to a validator. A save flattened into its container has no bundle to hash, and so no
 [content hash](#content-hash-and-file-hash) to carry, slice out or compare against a copy.
 
-An outer part MAY use an external reference instead of embedding, which makes a **thin card**: a list of slots, dirents
-and content hashes, with the saves themselves resolved from a content-addressable store.
-
 #### `Part` (map)
 
 | Key | Name           | Type        | Req? | Notes                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -272,13 +269,13 @@ and content hashes, with the saves themselves resolved from a content-addressabl
 | 5   | `dirent`       | byte string | no   | That container's own directory entry for this part, verbatim. Fully opaque: this spec never says what a byte inside it means, which is what keeps a card-format parser out of the container. Its length is fixed by the card's [`format`](#card-map), except on `saturn-bup`, which keeps its entry inside the save's first block and so omits this key.                                   |
 | 6   | `content_type` | text        | no   | Media type of the payload. No [kind](#part-kinds) requires it, but it is the only place the format says what a blob is, so set it whenever there is a registered type to name.                                                                                                                                                                                                             |
 | 7   | `encoding`     | text        | no   | `"zstd"` when the payload is compressed. Absent means `"none"`, which MUST NOT be written out. Compression is per-part. A spec-owned [slug](/specifications/common-types/slug/) and the only one this version defines; another codec comes from a PR against this spec.                                                                                                                    |
-| 8   | `size`         | uint        | some | **Uncompressed** byte length of the payload. Carried only where it cannot be derived: when the payload is `zstd` or an external reference. MUST be absent otherwise, since an embedded uncompressed payload already states its own length.                                                                                                                                                 |
+| 8   | `size`         | uint        | some | **Uncompressed** byte length of the payload. Carried when the payload is `zstd` and never otherwise, since an uncompressed payload already states its own length.                                                                                                                                                                                                                          |
 | 9   | `sha256`       | tagged bstr | yes  | SHA-256 over the **uncompressed** payload, as a [hash value](/specifications/common-types/hash-value/): 32 bytes under tag `18540`. Only that tag is legal, so identity and dedup have one answer; the tag is there so a generic CBOR tool can name the digest without knowing this format.                                                                                                |
 | 10  | `source`       | map         | no   | Who produced this part's bytes, when that differs from the bundle's [`source`](#source-map). Same shape as the header map. Absent means the header's source applies.                                                                                                                                                                                                                       |
 | 11  | `game`         | map         | no   | Which game this part's bytes belong to, when that differs from the bundle's [`game`](#game-hints-map). Same shape as the header map. Absent means the header's game applies.                                                                                                                                                                                                               |
 | 12  | `system`       | text        | no   | [Index copy](#nested-bundles) of a nested bundle's [`system`](#0-header-map). Meaningless on a part that is not a `bundle`.                                                                                                                                                                                                                                                                |
 | 13  | `binding`      | text        | no   | Present when this payload is bound to the console, account or medium it came from, so it will not restore anywhere else. `device` \| `account` \| `device-account` \| `medium`. A spec-owned [slug](/specifications/common-types/slug/); a new one comes from a PR against this spec. Absent means the bytes are portable. See [Bound payloads](#bound-payloads).                          |
-| -1  | `payload`      | union       | yes  | Embedded byte string with the (optionally compressed) bytes, **or** an external-reference map `{ 0: "ref", 1: <sha256 hash value>, 2: <optional URI text> }`. The reference's hash MUST equal key 9. Negative, so the whole unsigned range stays free for later minor versions; see [Additive integer keys](/specifications/universal-saves-format/#additive-integer-keys).                |
+| -1  | `payload`      | bstr        | yes  | The payload bytes, compressed when `encoding` says so. Negative, so the whole unsigned range stays free for later minor versions; see [Additive integer keys](/specifications/universal-saves-format/#additive-integer-keys).                                                                                                                                                              |
 
 Keys are grouped so that a decoder reading them in order builds meaning as it goes. `kind` comes first because it
 conditions everything after it: whether the payload is another bundle, whether `system` means anything, how `game`
@@ -308,19 +305,20 @@ to a user and matches it against a target, so two parts a consumer cannot tell a
 a container allows duplicate names, an N64 controller pak permits two notes with the same game code and note name, the
 producer MUST carry `slot` so the two stay distinct.
 
-A bundle is **self-contained** when every part carries its bytes inline, and **thin** when at least one part does not. A
-self-contained bundle works on its own; a thin one needs an external content-addressable store to resolve the referenced
-SHA-256s. A thin part MUST NOT set `encoding`: its reference is keyed by the hash of the uncompressed payload, so what
-the store holds is uncompressed by construction.
+Every part carries its bytes inline, so a bundle always works on its own.
 
-Between them, `encoding` and the payload's form give a part one of three forms, and whether `size` appears follows from
-which:
+Between them, `encoding` and `size` give a part one of two forms:
 
-| Shape                  | `size`  | `encoding` | `payload`          |
-| ---------------------- | ------- | ---------- | ------------------ |
-| Embedded, uncompressed | absent  | absent     | byte string        |
-| Embedded, compressed   | present | `"zstd"`   | byte string        |
-| Thin                   | present | absent     | external reference |
+| Form         | `size`  | `encoding` | `payload`   |
+| ------------ | ------- | ---------- | ----------- |
+| Uncompressed | absent  | absent     | byte string |
+| Compressed   | present | `"zstd"`   | byte string |
+
+`size` is what a producer says the payload will come to, not a promise it will. A consumer **MAY** decline to decompress
+a part whose `size` is larger than it is willing to handle, and **MAY** abandon a decompression that outgrows what it
+expected, the same way it may [reject a bundle with more parts than it wants](#1-parts-array-of-part): the number costs
+an attacker nothing to inflate, and a small payload can claim to expand without limit. Nothing obliges a consumer to
+read a part, so declining one is always available and is the answer to a payload it cannot afford.
 
 #### Bound payloads
 
@@ -393,16 +391,10 @@ with every part uncompressed and every payload embedded. It is a pure function o
 that build the same logical bundle agree on it. That is the identifier a content-addressable store keys on, and the
 value a [`bundle`](#nested-bundles) part's `sha256` holds.
 
-They are the same value for a bundle that is self-contained and uncompressed, which is every bundle nested inside
-another. They differ otherwise, and the reason they have to be defined separately is that determinism does not survive
-either compression or external references:
-
-- `zstd` output depends on the implementation, its version and the level, none of which the format pins, so two encoders
-  building the same logical bundle produce different files.
-- A thin bundle and its self-contained twin say the same thing with different bytes, so they cannot share a file hash
-  and must not have different content hashes. The price is that a thin bundle cannot compute its own content hash:
-  normalizing it means embedding every referenced payload, which means resolving every reference against the store
-  first.
+They are the same value for an uncompressed bundle, which is every bundle nested inside another. They differ only where
+a part is compressed, and that is the whole reason they are defined separately: `zstd` output depends on the
+implementation, its version and the level, none of which this format pins, so two encoders building the same logical
+bundle produce different files and the same content hash.
 
 #### What a content hash does not answer
 

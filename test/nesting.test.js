@@ -107,13 +107,6 @@ describe("nested bundles", () => {
       }
     }
   });
-
-  it("does not descend into a thin entry, which has no bytes to descend into", () => {
-    const entries = [...everyPart(valid["thin-card"])];
-    assert.equal(entries.length, 1, "the referenced bundle contributes no parts");
-    assert.equal(entries[0].bundle, undefined);
-    assert.ok(entries[0].part.get(PAYLOAD) instanceof Map, "the payload is an external reference");
-  });
 });
 
 // The bug the flat model had, pinned so it cannot come back: a card holds

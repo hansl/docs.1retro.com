@@ -134,21 +134,20 @@ part = {
   ? 11 => game,       ; game     (this part's game; absent = header game)
   ? 12 => system-slug,; system   (index copy of a nested bundle's header system)
   ? 13 => binding,    ; binding  (payload is bound to the console that wrote it)
-  ( compressed // thin // embedded ),
+  ( compressed // embedded ),
   * reverse-dns => any,   ; extension keys, flat as in the header
 }
 
 ; Keys 7 to 9 describe how to read the payload, and a streaming decoder meets
 ; them in the order it uses them: whether to inflate, how much that yields, and
 ; what the result must hash to. `size` is carried only where it cannot be
-; derived, which leaves a part in one of three forms.
+; derived, which is when the payload is compressed and only then.
 ;
 ; Arm order matters here and is not cosmetic: the tool takes the first that
-; matches without backtracking, so the most constrained shape comes first. With
+; matches without backtracking, so the more constrained form comes first. With
 ; `embedded` leading, a compressed part matches its `-1 => bstr` and then fails
 ; on the leftover keys.
 compressed = ( 7 => encoding, 8 => uint, 9 => sha256-hash, -1 => bstr )
-thin       = ( 8 => uint, 9 => sha256-hash, -1 => external-ref )
 embedded   = ( 9 => sha256-hash, -1 => bstr )
 
 kind = slug / reverse-dns     ; card-image | bundle | aux, or a minted name
@@ -160,12 +159,6 @@ binding = slug                ; device | account | device-account | medium
 ; "none" is the default and is written by leaving key 7 out, so the only
 ; encoding ever spelled here is the one that says something.
 encoding = "zstd"
-
-external-ref = {
-  0 => "ref",
-  1 => sha256-hash,   ; MUST equal the part's key 9
-  ? 2 => tstr,        ; URI
-}
 
 ; Tagged even though this spec pins the algorithm, so that a generic CBOR tool
 ; reading the bare-hash tag block can name the digest without knowing anything

@@ -198,27 +198,6 @@ export const valid = {
     }),
   ]),
 
-  // A thin card: the entry points at its save's content hash instead of
-  // embedding it, so the file is a list of slots, dirents and hashes.
-  "thin-card": card("psx", "ps1-mc", 131072, [
-    (() => {
-      const bytes = encode(oneFileSave("psx", MGS, BLOCK));
-      return new Map([
-        [0, 0],
-        [1, "bundle"],
-        [2, "memcard-1"],
-        [3, "BASLUS-00594"],
-        [4, 1],
-        [5, pattern(128, 1)],
-        [8, bytes.length],
-        [9, digest(bytes)],
-        [11, MGS],
-        [12, "psx"],
-        [-1, map({ 0: "ref", 1: digest(bytes), 2: "https://example.com/blob/mgs" })],
-      ]);
-    })(),
-  ]),
-
   // One console's storage read whole. A Sega CD carries internal backup RAM and
   // a Backup RAM Cart at once; neither is one game's state, and the pair is not
   // a collection, because both came off one system.

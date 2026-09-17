@@ -12,8 +12,7 @@ Non-normative. Each entry points at the text that defines the term, and that tex
 
 - **Bundle.** A complete `1SAV` document: the tag, the header and the array of parts. What a bundle _represents_ is
   whatever its header says, so the word alone does not say whether you hold one save, one card or a collection. It is
-  the format's self-contained unit and [means the same thing sliced out](/specifications/bundle/#nested-bundles) as in
-  place.
+  the format's atomic unit and [means the same thing sliced out](/specifications/bundle/#nested-bundles) as in place.
 - **Part.** One addressed slot inside a bundle, and not the atomic unit:
   [`kind`, `role`, `path`](/specifications/bundle/#part-map) fall back to defaults and `source` and `game` to the
   header, so a part lifted out of its bundle loses most of what it meant.
@@ -66,14 +65,11 @@ Most normative rules name one of these three, and which one is the whole meaning
 
 ## Payloads and integrity
 
-- **Self-contained.** Every part carries its bytes inline, so the bundle works on its own.
-- **Thin.** At least one part names its payload by hash instead of carrying it, so the bundle needs a
-  content-addressable store to resolve.
 - **Content hash.** The SHA-256 of a bundle's normalized encoding: uncompressed, every payload embedded. A pure function
   of what the bundle says, and a nested save's identity. See
   [Content hash and file hash](/specifications/bundle/#content-hash-and-file-hash).
 - **File hash.** The SHA-256 of the bytes on disk. It identifies one exact file, and equals the content hash only for a
-  bundle that is self-contained and uncompressed.
+  bundle that is uncompressed.
 - **Normalized.** Of a nested bundle: uncompressed with every payload embedded, which is required so that its file hash
   and content hash are the same value.
 - **Bound payload.** A payload tied to the console that wrote it, which a consumer
