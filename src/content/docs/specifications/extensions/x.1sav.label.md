@@ -32,8 +32,8 @@ title: a PS2 title carries a break offset into a single string, and both halves 
 
 On nearly every format it is in the save's payload rather than in the directory entry. GameCube keeps a comment address,
 PS1 keeps its 64-byte title in the save's first block, a VMU's descriptions are in the VMS header, Saturn has no entry
-at all, and a PS2 save keeps its title in `icon.sys`. N64 is the exception: a controller pak's note table holds the note
-name.
+at all, a PS2 save keeps its title in `icon.sys`, and a Neo Geo game writes one into the first 20 bytes of its own data.
+N64 is the exception: a controller pak's note table holds the note name.
 
 ## Where it goes
 
@@ -71,5 +71,9 @@ either.
 
 ## When to set it
 
-Only when the producer read the text. A producer that would be guessing omits the key. A save with no text anywhere has
-nothing to put here: a Neo Geo entry is a sub-number, an NGH number and an index into the FAT, and names nothing at all.
+Only when the producer read the text. A producer that would be guessing omits the key.
+
+A save with no text anywhere has nothing to put here, and whether it has any is the game's doing rather than the
+format's. Neo Geo is where both cases sit side by side: Metal Slug 4 labels its saves `METAL SLUG V3`, and Fatal Fury 2
+writes a binary header with no title in it. The first carries a `title`, the second carries no key at all, and a
+producer **MUST NOT** fill the gap from [`game`](/specifications/bundle/#game-hints-map).
