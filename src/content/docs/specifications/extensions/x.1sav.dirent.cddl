@@ -13,15 +13,41 @@
 ; Written as a choice rather than two optional keys so that an empty map is not
 ; a valid value: a producer with neither time omits the key instead.
 dirent = {
-    0 => entry-seconds,     ; created_at  - when the directory dates the entry
-  ? 1 => entry-seconds,     ; modified_at - when the console last wrote it
+    0 => entry-time,        ; created_at  - when the directory dates the entry
+  ? 1 => entry-time,        ; modified_at - when the console last wrote it
 } / {
-    1 => entry-seconds,
+    1 => entry-time,
 }
 
-; Whole seconds on the Unix scale, for the reason `created_at` gives in the
-; format spec: tag 1 admits a float, and allowing it would give one instant two
-; encodings. Directories count from wherever suits them, a GameCube entry from
-; 2000-01-01 and a Saturn entry in minutes from 1980-01-01, and converting that
-; once is the work this key exists to do.
+; A reading, and the zone it was taken in where a producer knows it. An array
+; rather than a second key on the map, so the offset binds to the reading it
+; qualifies: a save created in winter and last written in summer was kept in two
+; offsets, and one field beside the pair could not say so. It is also the shape
+; `x.1sav.icon` already uses for a `frame`, a value and the qualifier it may
+; turn out not to have, and it leaves an offset with no reading beside it
+; unwritable rather than merely invalid.
+entry-time = [
+    entry-seconds,
+  ? utc-offset,
+]
+
+; The wall clock the console showed, as whole seconds on the Unix scale, reached
+; by reading that wall clock as though it were UTC. Tag 1 for the reason
+; `created_at` gives in the format spec: it admits a float, and allowing one
+; would give a single reading two encodings. Directories count from wherever
+; suits them, a GameCube entry from 2000-01-01 and a Saturn entry in minutes
+; from 1980-01-01, and converting that once is the work this key exists to do.
+;
+; What it is not is an instant. Most consoles here never record the zone their
+; clock was set to, so the seconds alone fix a wall clock rather than a point in
+; time, and the offset beside them is what closes that gap where a producer can.
 entry-seconds = #6.1(int)
+
+; Seconds east of UTC, so the instant is the reading minus this. Present only
+; where a producer knows the zone the console's clock was set to, which is what
+; lets the first element mean the same thing whether a second follows it or not:
+; a consumer that reads only the head of the array gets the wall clock the card
+; recorded, which is never wrong, only less than the whole answer.
+;
+; The range is the span real zones occupy, -12:00 through +14:00.
+utc-offset = -43200..50400

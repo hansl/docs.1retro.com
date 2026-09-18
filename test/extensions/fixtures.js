@@ -47,22 +47,56 @@ export const extensions = {
     schema: `${DIR}/x.1sav.dirent.cddl`,
     valid: {
       // A PS2 entry dates the save and records the last write.
-      both: map({ 0: new Tag(1, 1044057600), 1: new Tag(1, 1044144000) }),
+      both: map({ 0: [new Tag(1, 1044057600)], 1: [new Tag(1, 1044144000)] }),
       // A VMU entry has a creation time and no modify time; GameCube is the
-      // other way around. Each format carries the one it keeps.
-      "created-only": map({ 0: new Tag(1, 1044057600) }),
-      "modified-only": map({ 1: new Tag(1, 1044144000) }),
+      // other way around. Each format carries the one it keeps, and a GameCube
+      // clock has no zone, so the one-element form is the common case rather
+      // than a degraded one.
+      "created-only": map({ 0: [new Tag(1, 1044057600)] }),
+      "modified-only": map({ 1: [new Tag(1, 1044144000)] }),
+      // A PS2 keeps its directory times in a fixed +9 whatever the region, and
+      // a producer that knows that says so on each reading.
+      "with-offset": map({ 0: [new Tag(1, 1044057600), 32400], 1: [new Tag(1, 1044144000), 32400] }),
+      // The case a single offset beside the pair could not express: created
+      // under one offset and last written under another, which is any console
+      // in a zone that keeps summer time.
+      "offsets-differ": map({ 0: [new Tag(1, 1044057600), 3600], 1: [new Tag(1, 1058054400), 7200] }),
+      // Knowing the zone of one reading is not knowing the zone of the other.
+      "one-offset-known": map({ 0: [new Tag(1, 1044057600), 32400], 1: [new Tag(1, 1044144000)] }),
+      // West of UTC, and the outer edges of the range real zones occupy.
+      "negative-offset": map({ 0: [new Tag(1, 1044057600), -28800] }),
+      "offset-min": map({ 0: [new Tag(1, 1044057600), -43200] }),
+      "offset-max": map({ 0: [new Tag(1, 1044057600), 50400] }),
+      // Zero is a claim rather than a default: this producer knows the console
+      // was set to UTC, which is not the same as not knowing.
+      "offset-zero": map({ 0: [new Tag(1, 1044057600), 0] }),
     },
     invalid: {
       // A producer holding neither time omits the key, so an empty map, which
       // would say nothing and still validate, is not one.
       empty: map({}),
-      // Whole seconds, tagged, exactly as `x.1sav.rtc` carries an instant.
-      "created-untagged": map({ 0: 1044057600 }),
-      "modified-as-float": map({ 1: new Tag(1, new Float(1044057600.5)) }),
+      // The reading is an array even when it is alone, so the bare tagged form
+      // a producer would reach for first is not a second way to write one.
+      "time-not-an-array": map({ 0: new Tag(1, 1044057600) }),
+      "time-array-empty": map({ 0: [] }),
+      "time-array-overfull": map({ 0: [new Tag(1, 1044057600), 32400, 1] }),
+      // Whole seconds, tagged, exactly as `x.1sav.rtc` carries a reading.
+      "created-untagged": map({ 0: [1044057600] }),
+      "modified-as-float": map({ 1: [new Tag(1, new Float(1044057600.5))] }),
+      // The offset is a plain integer count of seconds east of UTC. Not text,
+      // not a tagged time, and not a fraction, all of which a producer might
+      // reach for and which would each read as a live value.
+      "offset-as-text": map({ 1: [new Tag(1, 1044144000), "+09:00"] }),
+      "offset-tagged": map({ 1: [new Tag(1, 1044144000), new Tag(1, 32400)] }),
+      "offset-as-float": map({ 1: [new Tag(1, 1044144000), new Float(32400)] }),
+      // Outside the span real zones occupy, which is what catches hours or
+      // minutes mistaken for seconds once the number is large enough to land
+      // out of range. The page is where the unit itself is stated.
+      "offset-past-east-edge": map({ 1: [new Tag(1, 1044144000), 86400] }),
+      "offset-past-west-edge": map({ 1: [new Tag(1, 1044144000), -86400] }),
       // The text is `x.1sav.label`'s. Carrying it here too would put one answer
       // in two places, able to disagree.
-      "title-as-a-key": map({ 1: new Tag(1, 1044144000), 2: "F-ZERO GX" }),
+      "title-as-a-key": map({ 1: [new Tag(1, 1044144000)], 2: "F-ZERO GX" }),
       "not-a-map": 1044057600,
     },
   },

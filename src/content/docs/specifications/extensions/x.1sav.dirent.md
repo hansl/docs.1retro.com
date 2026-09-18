@@ -1,6 +1,7 @@
 ---
 title: x.1sav.dirent
-description: What a card's directory records about one save, normalized to a Unix instant.
+description:
+  What a card's directory records about one save, on a scale a consumer can read, with the zone where one is known.
 slug: specifications/extensions/x.1sav.dirent
 ---
 
@@ -8,9 +9,10 @@ slug: specifications/extensions/x.1sav.dirent
 · **Status:** normative schema, optional to carry
 
 When a card's directory dates a save and when it says the console last wrote it, on a scale a consumer can read without
-knowing how that card counts time. The entry itself is carried verbatim in [`dirent`](/specifications/bundle/#part-map),
-which is enough to write the save back onto a card and useless for anything else. The name sits in the
-[`x` tree](/specifications/common-types/reverse-dns-name/#the-x-tree) because the value belongs to no single producer.
+knowing how that card counts time, and the zone those times were kept in where a producer knows it. The entry itself is
+carried verbatim in [`dirent`](/specifications/bundle/#part-map), which is enough to write the save back onto a card and
+useless for anything else. The name sits in the [`x` tree](/specifications/common-types/reverse-dns-name/#the-x-tree)
+because the value belongs to no single producer.
 
 ## Schema
 
@@ -22,6 +24,29 @@ which is enough to write the save back onto a card and useless for anything else
 format carries whichever it keeps: a GameCube entry has a modify time and no creation time, a VMU entry the reverse, a
 PS2 entry both. A producer holding neither omits the key, which is why the schema is a choice rather than two optional
 keys.
+
+Both are the wall clock the console showed, put on the Unix scale by reading that wall clock as though it were UTC. They
+are deliberately not instants. A GameCube sets its clock in the IPL menu with no notion of a zone, and a VMU is the
+same, so the seconds a directory holds fix a date and a time of day and say nothing about where on Earth that was.
+Calling such a reading UTC would be a guess dressed as a fact, and one a consumer could not see through.
+
+The offset is what closes the gap, in seconds east of UTC, so the instant is the reading minus the offset. It follows a
+reading only where a producer actually knows the zone the console's clock was set to: a PS2 keeps its directory times in
+a fixed +9 whatever the console's region, and a producer that read the card as part of a
+[device](/specifications/device/) whose [`source`](/specifications/bundle/#source-map) records where the read happened
+knows it another way. A producer that does not know writes the one-element form, which is the common case and not a
+degraded one.
+
+The first element means the same thing whether a second follows it or not, which is the point of qualifying the reading
+rather than replacing it. A consumer that reads only the head of the array gets the wall clock the card recorded, in
+every case, and is never wrong by hours without being told. One that reads the tail gets a true instant wherever a
+producer could supply one.
+
+The zone rides on each reading rather than on the entry because one entry can hold two of them. A save created in winter
+and last written in summer was kept at two offsets on the same console, and a single field beside the pair could not say
+so. It is the shape [`x.1sav.icon`](/specifications/extensions/x.1sav.icon/) already uses for a frame, a value and the
+qualifier it may turn out not to have, and it leaves an offset with no reading beside it unwritable rather than merely
+invalid.
 
 Four of the seven [card formats](/specifications/memory-cards/) date an entry. PS1 and Neo Geo carry no time, and Saturn
 keeps its date inside the save rather than in a directory.
@@ -71,3 +96,9 @@ Only a format whose entry holds something a writer cannot get elsewhere gets one
 
 Only when the producer read the entry. A producer that would be guessing omits the key, and **MUST NOT** substitute the
 time it performed the dump, which is [`created_at`](/specifications/bundle/#0-header-map) in the bundle header.
+
+The offset is a separate decision from the reading it follows. Not knowing the zone is a reason to write the one-element
+form and no reason at all to drop the reading, which is what qualifying it separately buys: before, a producer reading a
+GameCube entry had a modify time it could not honestly convert, and the only conforming move was to drop a field the
+card really does hold. A producer **MUST NOT** fill the offset with the zone the _dump_ happened in, which is a fact
+about the reader rather than about the console, nor with a default of zero, which claims UTC and means it.

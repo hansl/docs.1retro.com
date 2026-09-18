@@ -38,12 +38,12 @@ per icon and two bits per frame. The decoded picture is [`x.1sav.icon`](/specifi
 
 Four fields of the 64 are not carried here.
 
-| Field         | Offset     | Instead                                                                                              |
-| ------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
-| `modtime`     | 0x28       | Carried normalized as `modified_at` in [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/). |
-| `first_block` | 0x36       | The allocator's, and [regenerated](/specifications/memory-cards/#what-a-writer-regenerates).         |
-| `block_count` | 0x38       | Payload size over the [block size](/specifications/memory-cards/#per-format-facts).                  |
-| padding       | 0x06, 0x3a | Constant `0xff` and `0xffff`.                                                                        |
+| Field         | Offset     | Instead                                                                                                                                                                                                                              |
+| ------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `modtime`     | 0x28       | Carried as `modified_at` in [`x.1sav.dirent`](/specifications/extensions/x.1sav.dirent/). A GameCube clock has no zone, so the reading takes the one-element form there and the value is a plain shift of epoch in either direction. |
+| `first_block` | 0x36       | The allocator's, and [regenerated](/specifications/memory-cards/#what-a-writer-regenerates).                                                                                                                                         |
+| `block_count` | 0x38       | Payload size over the [block size](/specifications/memory-cards/#per-format-facts).                                                                                                                                                  |
+| padding       | 0x06, 0x3a | Constant `0xff` and `0xffff`.                                                                                                                                                                                                        |
 
 Re-serializing this key therefore reproduces the entry except for the fields a writer owns. A consumer that wants the
 original 64 bytes reads the part's [`dirent`](/specifications/bundle/#part-map).
