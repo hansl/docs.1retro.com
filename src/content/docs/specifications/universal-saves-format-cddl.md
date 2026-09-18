@@ -18,7 +18,7 @@ Every text a producer mints is checked. The two that are a bare `reverse-dns` ar
 reverse-DNS name matches no rule and fails. What sits _under_ an extension key is `any` and is never checked, which is
 deliberate rather than a gap; so is a `game_id` value, which is whatever form its catalog publishes.
 
-This schema describes v0.1 exactly, so an integer key it does not list fails validation. A shipped decoder is
+This schema describes v0.3 exactly, so an integer key it does not list fails validation. A shipped decoder is
 deliberately looser, ignoring and round-tripping an integer key it does not recognize on the grounds that the only thing
 such a key can be is a later minor version's field; see
 [Additive integer keys](/specifications/universal-saves-format/#additive-integer-keys). A schema for one version cannot
