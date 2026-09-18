@@ -67,8 +67,9 @@ Three cases need it, and a producer that does not meet them should not reach for
 - **Several sockets.** One game whose state spans two places on the same system: 3DS savedata in `sysnand` beside
   extdata on `sd`, or an N64 cartridge save beside that game's note in a Controller Pak. [`role`](/registries/roles/)
   tells them apart.
-- **Several files.** A PS2 save is a directory and a 3DS extdata save is a folder.
-  [`path`](/specifications/bundle/#part-map) tells those apart.
+- **Several files.** A PS2 save is a directory and a 3DS extdata save is a folder. An arcade board is the same case in
+  different clothes: its state is battery-backed NVRAM and an EEPROM and sometimes a timekeeper chip, one part each.
+  [`path`](/specifications/bundle/#part-map) tells those apart, carrying the name the dumping tool uses for the chip.
 - **Anything else binary.** An [`aux` part](/specifications/bundle/#part-kinds) with a `content_type`.
 
 A save's parts are never [`bundle` parts](/specifications/bundle/#nested-bundles). One game's note in a Controller Pak

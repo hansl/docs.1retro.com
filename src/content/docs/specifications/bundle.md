@@ -99,8 +99,9 @@ are optional.
 domain and the name is yours, with no registry needed to avoid collisions. The id is an integer or a string, whichever
 form the catalog publishes. A producer aligned with several catalogs records one entry per catalog. Consumers MUST
 round-trip entries with unknown resolver names unchanged and skip them when matching. Known resolvers: `com.1retro` (the
-1retro catalog), `com.mobygames` (MobyGames game id), `org.hasheous` (Hasheous id). To list a new resolver here, open a
-PR against this spec; the listing is only for discovery.
+1retro catalog), `com.mobygames` (MobyGames game id), `org.hasheous` (Hasheous id), `org.mamedev` (MAME romset short
+name, `"sf2ce"`). An arcade machine is identified this way rather than by `serial`, which is a code from a ROM header
+and not a catalog's key. To list a new resolver here, open a PR against this spec; the listing is only for discovery.
 
 `rom_hashes` is an array of [hash values](/specifications/common-types/hash-value/), which is where the four algorithms,
 their tags, their ordering and their comparison rules all live. A producer emits every hash it has already computed and
